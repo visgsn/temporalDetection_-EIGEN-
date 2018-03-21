@@ -16,8 +16,8 @@ from time import sleep
 
 
 # Configuration variables
-possible_gpus =     ["0", "1", "2", "3"]    # Define all possible GPUs for your process as list, e.g. ["0", "1"]
-check_interval =    5                       # Time interval to check if any GPU is free
+possible_gpus =     ["1"]    # Define all possible GPUs for your process as list, e.g. ["0", "1"]
+check_interval =    10                      # Time interval to check if any GPU is free
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
@@ -36,6 +36,7 @@ def main():
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
 
+        output_saved = output[:]
         output = output.splitlines()
         for lineNr in range(0, len(output)):
             if "===============================================================" in output[lineNr]:
@@ -50,15 +51,17 @@ def main():
                 logging.debug("### Stripped output: " + stripped_output[0])
                 if stripped_output[0] == "+" and len(remaining_gpus) != 0:      # GPUs free! --> Execute Process
                     # Starting process on free GPU
-                    print "****************************************************************"
+                    print "******************************************************************"
                     logging.info("***** Starting process: " + str(sys.argv[1]) + " *****")
                     logging.info("On GPU #" + str(remaining_gpus[0]))
                     logging.debug("GPUs free! --> Execute Process")
                     logging.debug("List of remaining GPUs: " + str(remaining_gpus))
+                    print "nvidia-smi output at startup:"
+                    print str(output_saved)
                     bashCommand = "python " + str(sys.argv[1]) + " " + str(remaining_gpus[0])
                     process = subprocess.Popen(bashCommand.split(), stdout=None)
                     output_2, error_2 = process.communicate() # Waiting for process to finish!
-                    print "****************************************************************"
+                    print "******************************************************************"
                     logging.info("DONE")
                     return 0
 
