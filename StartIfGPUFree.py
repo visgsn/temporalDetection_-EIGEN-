@@ -1,10 +1,10 @@
 '''
-    USAGE: python StartToTrainIFGPUFree <Script_to_start_on_a_GPU.py>
+    USAGE: python StartToTrainIfGPUFree <Script_to_start_on_a_GPU.py>
 
     (Insert e.g.
 
         import sys
-        <gpus_var> = str(sys.argv[1])       # GPU to use for execution
+        <gpus_var> = str(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py" # GPU to use for execution
 
     where the desired GPU is selected IN YOUR PROGRAM!)
 '''
@@ -15,8 +15,8 @@ import sys
 from time import sleep
 
 
-# Configuration variables
-possible_gpus =     ["1"]    # Define all possible GPUs for your process as list, e.g. ["0", "1"]
+### Configuration variables ###
+possible_gpus =     ["0"]    # Define all possible GPUs for your process as list, e.g. ["0", "1"]
 check_interval =    10                      # Time interval to check if any GPU is free
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)

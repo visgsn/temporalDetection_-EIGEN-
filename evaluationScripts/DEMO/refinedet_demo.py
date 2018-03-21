@@ -69,7 +69,11 @@ def ShowResults(img, image_file, results, labelmap, threshold=0.6, save_fig=Fals
 
 if __name__ == '__main__':
     # gpu preparation
-    gpu_id = 0
+    ### *** HOME ***
+    #gpu_id = 0
+    ### *** WORK ***
+    gpu_id = str(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+
     caffe.set_device(gpu_id)
     caffe.set_mode_gpu()
 
@@ -80,12 +84,12 @@ if __name__ == '__main__':
     text_format.Merge(str(file.read()), labelmap)
 
     # load model
-    # *** HOME ***
-    path_prefix = "{}/train_test_data".format(os.environ['HOME'])
-    file_postfix = "iter_10000"
-    # *** WORK ***
-    #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+    ### *** HOME ***
+    #path_prefix = "{}/train_test_data".format(os.environ['HOME'])
     #file_postfix = "iter_10000"
+    ### *** WORK ***
+    path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+    file_postfix = "iter_120000"    # Select which trained state to use?!?
 
     model_def = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320/deploy.prototxt'.format(path_prefix)
     model_weights = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320'.format(path_prefix) + \

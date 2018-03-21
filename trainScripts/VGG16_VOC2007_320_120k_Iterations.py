@@ -83,14 +83,14 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 caffe_root = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
 
 # Set true if you want to start training right after generating all files.
-run_soon = True                                                                # Change back to True!!!
+run_soon = True                                                                 # Change back to True!!!
 # Set true if you want to load from most recently saved snapshot.
 # Otherwise, we will load from the pretrain_model defined below.
 #resume_training = True                                                         # ORIGINAL
-resume_training = False
+resume_training = True
 # If true, Remove old model files.
 #remove_old_models = False                                                       # ORIGINAL
-remove_old_models = True
+remove_old_models = False
 
 # The database file for training data. Created by data/VOC0712/create_data.sh
 #train_data = "examples/VOC0712/VOC0712_trainval_lmdb"                           # ORIGINAL
@@ -403,9 +403,9 @@ solver_param = {
     'momentum': 0.9,
     'iter_size': iter_size,
     #'max_iter': 120000,                # ORIGINAL
-    'max_iter': 10000,
+    'max_iter': 120000,
     #'snapshot': 5000,                  # ORIGINAL
-    'snapshot': 2500,
+    'snapshot': 5000,
     'display': 10,
     'average_loss': 10,
     'type': "SGD",

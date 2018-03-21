@@ -4,17 +4,22 @@ from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
 from datasets.factory import get_imdb
 import caffe
 import os
+import sys
 
 if __name__ == '__main__':
-    GPU_ID = 0
+    ### *** HOME ***
+    #GPU_ID = 0                                                                             # ORIGINAL
+    ### *** WORK ***
+    GPU_ID = str(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+
     single_scale = True # True: single scale test;  False: multi scale test
     test_set = 'voc_2007_test' # 'voc_2007_test' or 'voc_2012_test' or 'coco_2014_minival' or 'coco_2015_test-dev'
 
     #voc_path = 'models/VGGNet/VOC0712/refinedet_vgg16_320x320/'                             # ORIGINAL
-    # *** HOME ***
-    path_prefix = "{}/train_test_data".format(os.environ['HOME'])
-    # *** WORK ***
-    #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+    ### *** HOME ***
+    #path_prefix = "{}/train_test_data".format(os.environ['HOME'])
+    ### *** WORK ***
+    path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
     voc_path = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320/'.format(path_prefix)
     #coco_path = 'models/VGGNet/coco/refinedet_vgg16_320x320/'
