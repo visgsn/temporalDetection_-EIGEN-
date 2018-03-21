@@ -16,7 +16,9 @@ from time import sleep
 
 
 ### Configuration variables ###
-possible_gpus =     ["0"]    # Define all possible GPUs for your process as list, e.g. ["0", "1"]
+# Define all possible GPUs for your process as list, e.g. ["0", "1"]
+#possible_gpus =     ["0", "1", "2", "3"]    # ***deneb***
+possible_gpus =     ["0"]                   # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
 check_interval =    10                      # Time interval to check if any GPU is free
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
