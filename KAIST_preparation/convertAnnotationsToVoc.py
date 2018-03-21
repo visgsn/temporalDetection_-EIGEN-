@@ -10,16 +10,17 @@ from fileParts import fileParts
 ### *** HOME ***                                                                    # anpassen!
 #kaistFolder = '/home/herrma/deepdata/datasets/KAIST/data-kaist/'
 #outFolder = '/home/herrma/deepdata/users/herrma/datasets/KAIST/Annotations/'
-### *** WORK ***                                                                    # anpassen!
-kaistFolder = '/home/herrma/deepdata/datasets/KAIST/data-kaist/'
-outFolder = '/home/herrma/deepdata/users/herrma/datasets/KAIST/Annotations/'
+### *** WORK ***
+kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
+outFolder =     '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/Annotations/'
 
+dataToExtract = ['train-all20','test-all']
 excludeLabels = ['people','person?','cyclist']                                      # persons sollen rein?
 
 
-for fold in ['train-all20','test-all']:
+for fold in dataToExtract:
     annoFiles = dirRecursive(kaistFolder + fold + '/annotations', '*.txt')
-    imgFiles = dirRecursive(kaistFolder + fold + '/images', 'T_*.png')              # "T_" --> Thermal
+    imgFiles = dirRecursive(kaistFolder + fold + '/images', 'T_*.png')  # "T_" --> Thermal
     
     for (i,fPath) in enumerate(annoFiles):
         _,imgName,_ = fileParts(imgFiles[i])
@@ -34,7 +35,7 @@ for fold in ['train-all20','test-all']:
                 outFile.write('\t\t<image>' + imgName + '</image>\n\t</source>\n')
                 outFile.write('\t<size>\n\t\t<width>640</width>\n')
                 outFile.write('\t\t<height>512</height>\n')
-                outFile.write('\t\t<depth>3</depth>\n\t</size>\n')                 # Abmessungen korrekt? (depth)
+                outFile.write('\t\t<depth>3</depth>\n\t</size>\n')  # Dimensions correct? (depth)
                 outFile.write('\t<segmented>0</segmented>\n')
                    
                 # write bounding boxes                 
