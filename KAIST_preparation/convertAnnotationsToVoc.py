@@ -1,6 +1,10 @@
 '''
     This script converts all annotations from the KAIST dataset to a compatible format for VOC
-    and exports them into the output folder.
+    and exports them as .xml files into the output folder.
+
+    Afterwards you can run "generateVocLists.py"
+
+    Check paths below before execution!
 '''
 
 from dirRecursive import dirRecursive
@@ -18,9 +22,9 @@ dataToExtract = ['train-all20','test-all']
 excludeLabels = ['people','person?','cyclist']                                      # persons sollen rein?
 
 
-for fold in dataToExtract:
-    annoFiles = dirRecursive(kaistFolder + fold + '/annotations', '*.txt')
-    imgFiles = dirRecursive(kaistFolder + fold + '/images', 'T_*.png')  # "T_" --> Thermal
+for folder in dataToExtract:
+    annoFiles = dirRecursive(kaistFolder + folder + '/annotations', '*.txt')
+    imgFiles = dirRecursive(kaistFolder + folder + '/images', 'T_*.png')  # "T_" --> Thermal
     
     for (i,fPath) in enumerate(annoFiles):
         _,imgName,_ = fileParts(imgFiles[i])

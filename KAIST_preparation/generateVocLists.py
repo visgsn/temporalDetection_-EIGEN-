@@ -1,3 +1,10 @@
+'''
+    To use this script, first run "convertAnnotations.py" to convert the necessary Annotations
+    from the kaist-data sub-folder into the KAIST folder (target format: .xml).
+
+    Check paths below before execution!
+'''
+
 import os
 #import random
 
@@ -6,9 +13,9 @@ import os
 #kaistFolder = '/home/herrma/deepdata/users/herrma/datasets/KAIST/'
 ### *** WORK ***
 kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
-trainImgSub =   'train-all20/images'
-testImgSub =    'test-all/images'
 
+trainImgSub =   'train-all20/images'    # Desired training subset of kaistFolder (Contains .png IMAGES!)
+testImgSub =    'test-all/images'       # Desired test subset of kaistFolder (Contains .png IMAGES!)
 outputFolder =  '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/'
 
 
