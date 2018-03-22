@@ -10,7 +10,7 @@ if __name__ == '__main__':
     ### *** HOME ***
     #GPU_ID = 0                                                                             # ORIGINAL
     ### *** WORK ***
-    GPU_ID = str(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    GPU_ID = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     single_scale = True # True: single scale test;  False: multi scale test
     test_set = 'voc_2007_test' # 'voc_2007_test' or 'voc_2012_test' or 'coco_2014_minival' or 'coco_2015_test-dev'

@@ -72,7 +72,7 @@ if __name__ == '__main__':
     ### *** HOME ***
     #gpu_id = 0
     ### *** WORK ***
-    gpu_id = str(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    gpu_id = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     caffe.set_device(gpu_id)
     caffe.set_mode_gpu()
