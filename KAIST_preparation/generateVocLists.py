@@ -22,14 +22,14 @@ outputFolder =  '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/'
 trainFolder = kaistFolder + trainImgSub
 testFolder = kaistFolder + testImgSub
 
-with open(outputFolder + 'AdaptedImageSets/Main/trainval.txt', 'w+') as trainValFile:
+with open(outputFolder + 'ImageSets/Main/trainval.txt', 'w+') as trainValFile:
     for filename in os.listdir(trainFolder):    # List of all files in trainFolder
         if os.path.splitext(filename)[1] != '.db':
             trainValFile.write(trainFolder + '/' + os.path.splitext(filename)[0] + '.png ')
             trainValFile.write(outputFolder + 'Annotations/' + os.path.splitext(filename)[0] + '.xml')
             trainValFile.write("\n")
-	
-with open(outputFolder + 'AdaptedImageSets/Main/test.txt', 'w+') as testFile:
+
+with open(outputFolder + 'ImageSets/Main/test.txt', 'w+') as testFile:
     for filename in os.listdir(testFolder):     # List of all files in testFolder
         if os.path.splitext(filename)[1] != '.db':
             testFile.write(testFolder + '/' + os.path.splitext(filename)[0] + '.png ')

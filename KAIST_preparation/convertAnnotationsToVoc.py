@@ -18,8 +18,8 @@ from fileParts import fileParts
 kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
 outFolder =     '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/Annotations/'
 
-dataToExtract = ['train-all20','test-all']
-excludeLabels = ['people','person?','cyclist']                                      # persons sollen rein?
+dataToExtract = ['train-all20', 'test-all']
+excludeLabels = ['people', 'person?', 'cyclist']
 
 
 for folder in dataToExtract:
@@ -42,7 +42,7 @@ for folder in dataToExtract:
                 outFile.write('\t\t<depth>3</depth>\n\t</size>\n')  # Dimensions correct? (depth)
                 outFile.write('\t<segmented>0</segmented>\n')
                    
-                # write bounding boxes                 
+                # write bounding boxes
                 for line in f:
                     if '%' not in line:   
                         parts = line.split(' ')
