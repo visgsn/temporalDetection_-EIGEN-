@@ -7,29 +7,38 @@
     Check paths below before execution!
 '''
 
-from dirRecursive import dirRecursive
-from fileParts import fileParts
+from _usefulFunctions import *
+import os
+#from dirRecursive import dirRecursive
+#from fileParts import fileParts
 
+######### TEST #########
+# print "Here should be the test Message:"
+# print fileParts('/home/gueste/code/temporalDetection_(EIGEN)/test/')
+# print dirRecursive('/home/gueste/code/temporalDetection_(EIGEN)', 'T_.*.png$')
+# print "Is it there?"
+######### TEST #########
 
-### *** HOME ***                                                                    # anpassen!
-#kaistFolder = '/home/herrma/deepdata/datasets/KAIST/data-kaist/'
-#outFolder = '/home/herrma/deepdata/users/herrma/datasets/KAIST/Annotations/'
+### *** HOME ***
+kaistFolder =   '/home/gueste/data/KAIST/data-kaist'
+outFolder =     '/home/gueste/data/KAIST/Annotations/'
 ### *** WORK ***
-kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
-outFolder =     '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/Annotations/'
+#kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
+#outFolder =     '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/Annotations/'
 
 dataToExtract = ['train-all20', 'test-all']
 excludeLabels = ['people', 'person?', 'cyclist']
 
 
 for folder in dataToExtract:
-    annoFiles = dirRecursive(kaistFolder + folder + '/annotations', '*.txt')
-    imgFiles = dirRecursive(kaistFolder + folder + '/images', 'T_*.png')  # "T_" --> Thermal
-    
+    annoFiles = dirRecursive(os.path.join(kaistFolder, folder, 'annotations') , '.*.txt$')
+    imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'T_.*.png$')  # "T_" --> Thermal
+
     for (i,fPath) in enumerate(annoFiles):
         _,imgName,_ = fileParts(imgFiles[i])
+
         with open(fPath) as f:
-            
+
             with open(outFolder + imgName + '.xml', 'w') as outFile:
                 # write header
                 outFile.write('<annotation>\n\t<folder>KAIST</folder>\n')
@@ -41,12 +50,12 @@ for folder in dataToExtract:
                 outFile.write('\t\t<height>512</height>\n')
                 outFile.write('\t\t<depth>3</depth>\n\t</size>\n')  # Dimensions correct? (depth)
                 outFile.write('\t<segmented>0</segmented>\n')
-                   
+
                 # write bounding boxes
                 for line in f:
-                    if '%' not in line:   
+                    if '%' not in line:
                         parts = line.split(' ')
-                        
+
                         if parts[0] not in excludeLabels:
                             outFile.write('\t<object>\n\t\t')
                             outFile.write('<name>' + parts[0] + '</name>\n\t\t')
@@ -57,6 +66,6 @@ for folder in dataToExtract:
                             outFile.write('<ymax>{:d}</ymax>\n\t\t\t'.format(int(parts[2]) + int(parts[4]) - 1))
                             outFile.write('</bndbox>\n\t\t')
                             outFile.write('<difficult>0</difficult>\n\t')
-                            outFile.write('</object>\n')                               
-                                
+                            outFile.write('</object>\n')
+
                 outFile.write('</annotation>')
