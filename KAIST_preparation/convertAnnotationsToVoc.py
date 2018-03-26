@@ -9,15 +9,6 @@
 
 from _usefulFunctions import *
 import os
-#from dirRecursive import dirRecursive
-#from fileParts import fileParts
-
-######### TEST #########
-# print "Here should be the test Message:"
-# print fileParts('/home/gueste/code/temporalDetection_(EIGEN)/test/')
-# print dirRecursive('/home/gueste/code/temporalDetection_(EIGEN)', 'T_.*.png$')
-# print "Is it there?"
-######### TEST #########
 
 ### *** HOME ***
 kaistFolder =   '/home/gueste/data/KAIST/data-kaist'
@@ -29,6 +20,10 @@ outFolder =     '/home/gueste/data/KAIST/Annotations/'
 dataToExtract = ['train-all20', 'test-all']
 excludeLabels = ['people', 'person?', 'cyclist']
 
+
+if not os.path.isdir(outFolder):
+    print "Creating output directory '" + str(outFolder) + "' because it doesn't exist."
+    os.makedirs(outFolder)
 
 for folder in dataToExtract:
     annoFiles = dirRecursive(os.path.join(kaistFolder, folder, 'annotations') , '.*.txt$')
