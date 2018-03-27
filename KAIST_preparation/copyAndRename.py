@@ -153,9 +153,12 @@ for (i,list_entry) in enumerate(availableAnnos):
 
 
 # Copy files to new destination folder (outputDir/...)
-logging.info("Start copying " + str(len(nameAnno)+len(nameThermal)+len(nameRgb)) + " files to output folders:\n'" \
+numImages = len(nameAnno)+len(nameThermal)+len(nameRgb)
+logging.info("Start copying " + str(numImages) + " files to output folders:\n'" \
              + annoDir_out + "' and\n'" \
              + imageDir_out + "'\n")
+progressOnePercent  = len(nameAnno) / 100 # Used to display progress while copying
+currentProgress     = 0
 for i in range(len(availableAnnos)):
     # Construct full paths
     annoFile_out    = os.path.join(annoDir_out, nameAnno[i])
@@ -173,6 +176,11 @@ for i in range(len(availableAnnos)):
     if not os.path.isfile(rgbFile_out):
         shutil.copyfile(rgbImages[i], rgbFile_out)
     else: logging.warning("WARNING: File '" + str(rgbFile_out) + "' already esisting. --> NOT copied!")
+
+    # Print progress status
+    if 0 == i % progressOnePercent:
+        logging.info(str(currentProgress) + "% complete")
+        currentProgress += 1
 
 print "\n\n"
 logging.info("DONE.")
