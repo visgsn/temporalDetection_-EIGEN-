@@ -9,6 +9,7 @@
 '''
 
 from _usefulFunctions import *
+import shutil
 import os
 import sys
 import re
@@ -22,12 +23,13 @@ outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all"
 ### *** WORK ***
 # Insert config for WORK here...
 
-logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 annoRegex       = '.*.txt$'         # Used to find available annotations
 imageRegex      = 'frame_.*.png$'   # Used to find available images
 extractSetRegex = '.*\/set0[0-5]\/' # Specifies which sets to extract (Default: '.*\/set0[0-5]\/')
 splitThermRegex = '.*\/LWIR_V'      # Used to separate RGB- and thermal images
+logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 #############################################################
+
 
 
 
@@ -129,32 +131,48 @@ for (i,list_entry) in enumerate(availableAnnos):
     set = temp_var.group(0)
     logging.debug("Set: " + str(set))
 
+    # Verify correct image file order (lined up with annotations)
+    if not( re.search(frameNr, thermalImages[i]) and re.search(subset, thermalImages[i]) and \
+            re.search(set, thermalImages[i]) and re.search(frameNr, rgbImages[i]) and \
+            re.search(subset, rgbImages[i]) and re.search(set, rgbImages[i]) ):
+        logging.error("ERROR: Annotation file order does not match Image file order!")
+        sys.exit(1)
+
     # Wrap single parts together to one big filename for each filetype
-    nameAnno    = "{}_{}_I{}{}".format(set, subset, frameNr, extensionAnno)
-    nameThermal = "T_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionTherm)
-    nameRgb     = "RGB_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionRgb)
-    logging.debug("nameAnno     : " + str(nameAnno))
-    logging.debug("nameThermal  : " + str(nameThermal))
-    logging.debug("nameRgb      : " + str(nameRgb))
+    nameAnno_tmp    = "{}_{}_I{}{}".format(set, subset, frameNr, extensionAnno)
+    nameThermal_tmp = "T_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionTherm)
+    nameRgb_tmp     = "RGB_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionRgb)
+    # Append names to lists
+    nameAnno.append(nameAnno_tmp)
+    nameThermal.append(nameThermal_tmp)
+    nameRgb.append(nameRgb_tmp)
+    logging.debug("nameAnno     : " + str(nameAnno[i]))
+    logging.debug("nameThermal  : " + str(nameThermal[i]))
+    logging.debug("nameRgb      : " + str(nameRgb[i]))
+    logging.debug("----------------------------------------------------------")
 
 
+# Copy files to new destination folder (outputDir/...)
+logging.info("Start copying " + str(len(nameAnno)+len(nameThermal)+len(nameRgb)) + " files to output folders:\n'" \
+             + annoDir_out + "' and\n'" \
+             + imageDir_out + "'\n")
+for i in range(len(availableAnnos)):
+    # Construct full paths
+    annoFile_out    = os.path.join(annoDir_out, nameAnno[i])
+    thermalFile_out = os.path.join(imageDir_out, nameThermal[i])
+    rgbFile_out     = os.path.join(imageDir_out, nameRgb[i])
+    #Copy file if not existing
+    if not os.path.isfile(annoFile_out):
+        shutil.copyfile(availableAnnos[i], annoFile_out)
+    else: logging.warning("WARNING: File '" + str(annoFile_out) + "' already esisting. --> NOT copied!")
 
+    if not os.path.isfile(thermalFile_out):
+        shutil.copyfile(thermalImages[i], thermalFile_out)
+    else: logging.warning("WARNING: File '" + str(thermalFile_out) + "' already esisting. --> NOT copied!")
 
-    # path = splitFP[0]
-    # name = os.path.splitext(splitFP[1])[0]
-    #
-    # print frameNr
-    # frameNr = re.search('\/.*()\/', list_entry)
-    # if m:
-    #     found = m.group(1)
-    #
-    # splitFP = os.path.split(list_entry)
-    #
-    # path = splitFP[0]
-    # name = os.path.splitext(splitFP[1])[0]
-    # extension = os.path.splitext(splitFP[1])[1]
+    if not os.path.isfile(rgbFile_out):
+        shutil.copyfile(rgbImages[i], rgbFile_out)
+    else: logging.warning("WARNING: File '" + str(rgbFile_out) + "' already esisting. --> NOT copied!")
 
-
-    # print "List_entry[1]: " + str(list_entry[1])
-
-    #break
+print "\n\n"
+logging.info("DONE.")
