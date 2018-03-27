@@ -42,6 +42,7 @@ if not os.path.isdir(imageDir_out):
     logging.info("Creating output directory '" + str(imageDir_out) + "' because it doesn't exist.")
     os.makedirs(imageDir_out)
 
+
 # Collect available images and annotations
 availableAnnos  = dirRecursive(annoDir, annoRegex)
 availableImages = dirRecursive(imageDir, imageRegex)
@@ -53,6 +54,7 @@ logging.info("Found " + str(len(availableAnnos)) + " available annotations in to
 logging.info("---------------------------------------------------------------------------------")
 logging.info("Found " + str(len(availableImages)) + " available images in total, e.g.:\n" \
              + str(availableImages[0:5]) + "\n")
+
 
 # Pick desired sets from database (Extract only training sets)
 setPattern  = re.compile(extractSetRegex)
@@ -72,8 +74,9 @@ logging.info("------------------------------------------------------------------
 logging.info("Found " + str(len(availableImages)) + " images after choosing sets, e.g.:\n" \
              + str(availableImages[0:5]) + "\n")
 
+
 # Separate RGB- and thermal images
-thermPattern      = re.compile(splitThermRegex)
+thermPattern    = re.compile(splitThermRegex)
 thermalImages   = []
 rgbImages       = []
 for singleFile in availableImages:
@@ -95,5 +98,63 @@ logging.info("Found " + str(len(thermalImages)) + "/" + str(len(rgbImages)) + \
              "RGB    : " + str(rgbImages[0:5]) + "\n")
 
 
+# Combine new file names
+nameAnno    = []
+nameThermal = []
+nameRgb     = []
+for (i,list_entry) in enumerate(availableAnnos):
+    # Split path until all necessary variables are filled
+    list_entry = os.path.splitext(list_entry)   # (path/setXX/VXXX/filename, .extension)
+    extensionAnno = list_entry[1]
+    logging.debug("ExtensionAnno: " + str(extensionAnno))
 
-# Split images and annotations
+    extensionTherm = os.path.splitext(thermalImages[i])[1]
+    logging.debug("ExtensionTherm: " + str(extensionTherm))
+
+    extensionRgb = os.path.splitext(rgbImages[i])[1]
+    logging.debug("ExtensionRgb: " + str(extensionRgb))
+
+    list_entry = os.path.split(list_entry[0])   # (path/setXX/VXXX, filename)
+    temp_var = re.search('I([0-9]+)', list_entry[1])
+    frameNr = temp_var.group(1)
+    logging.debug("Frame #: " + str(frameNr))   # Without first number!!! (I)
+
+    list_entry = os.path.split(list_entry[0])   # (path/setXX, VXXX)
+    temp_var = re.search('(V[0-9]+)', list_entry[1])
+    subset = temp_var.group(0)
+    logging.debug("Subset: " + str(subset))
+
+    list_entry = os.path.split(list_entry[0])   # (path, setXX)
+    temp_var = re.search('(set[0-9]+)', list_entry[1])
+    set = temp_var.group(0)
+    logging.debug("Set: " + str(set))
+
+    # Wrap single parts together to one big filename for each filetype
+    nameAnno    = "{}_{}_I{}{}".format(set, subset, frameNr, extensionAnno)
+    nameThermal = "T_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionTherm)
+    nameRgb     = "RGB_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionRgb)
+    logging.debug("nameAnno     : " + str(nameAnno))
+    logging.debug("nameThermal  : " + str(nameThermal))
+    logging.debug("nameRgb      : " + str(nameRgb))
+
+
+
+
+    # path = splitFP[0]
+    # name = os.path.splitext(splitFP[1])[0]
+    #
+    # print frameNr
+    # frameNr = re.search('\/.*()\/', list_entry)
+    # if m:
+    #     found = m.group(1)
+    #
+    # splitFP = os.path.split(list_entry)
+    #
+    # path = splitFP[0]
+    # name = os.path.splitext(splitFP[1])[0]
+    # extension = os.path.splitext(splitFP[1])[1]
+
+
+    # print "List_entry[1]: " + str(list_entry[1])
+
+    #break
