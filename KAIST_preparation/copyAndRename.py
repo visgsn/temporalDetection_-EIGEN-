@@ -3,7 +3,7 @@
     been extracted with Pjotr's Matlab Toolbox. (By default only training data from set00 to set05)
     Names are chosen according to the scheme of "train_all20".
     Example for images:
-        T_tmp_set00_V000_I00019_<UUID>.png         (T_ stands for "thermal", RGB_ for color images)
+        T_tmp_set00_V000_I00019.png         (T_ stands for "thermal", RGB_ for color images)
     Example for annotations:
         set00_V000_I00019.txt
 '''
