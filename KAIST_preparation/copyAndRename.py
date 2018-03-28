@@ -20,9 +20,12 @@ import logging
 ### *** HOME ***
 annoDir     = "/home/gueste/data/KAIST/data-kaist/annotations-extracted"    # Input annotations
 imageDir    = "/home/gueste/data/KAIST/data-kaist/videos-extracted"         # Input images
-outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all"                # Last element of path used as data postfix!
+outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all-T"              # Last element of path used as data postfix!
 ### *** WORK ***
 # Insert config for WORK here...
+
+extractThermal  = True              # If true, thermal images will be extracted into outputDir
+extractRgb      = False             # If true, RGB images will be extracted into outputDir
 
 annoRegex       = '.*.txt$'         # Used to find available annotations
 imageRegex      = 'frame_.*.png$'   # Used to find available images
@@ -156,7 +159,13 @@ for (i,list_entry) in enumerate(availableAnnos):
 
 
 # Copy files to new destination folder (outputDir/...)
-numImages = len(nameAnno)+len(nameThermal)+len(nameRgb)
+numImages = len(nameAnno)
+if extractThermal:
+    logging.info("Thermal images will be copied")
+    numImages += len(nameThermal)
+if extractRgb:
+    logging.info("RGB images will be copied")
+    numImages += len(nameRgb)
 logging.info("Start copying " + str(numImages) + " files to output folders:\n'" \
              + annoDir_out + "' and\n'" \
              + imageDir_out + "'\n")
@@ -172,13 +181,15 @@ for i in range(len(availableAnnos)):
         shutil.copyfile(availableAnnos[i], annoFile_out)
     else: logging.warning("WARNING: File '" + str(annoFile_out) + "' already esisting. --> NOT copied!")
 
-    if not os.path.isfile(thermalFile_out):
-        shutil.copyfile(thermalImages[i], thermalFile_out)
-    else: logging.warning("WARNING: File '" + str(thermalFile_out) + "' already esisting. --> NOT copied!")
+    if extractThermal:
+        if not os.path.isfile(thermalFile_out):
+            shutil.copyfile(thermalImages[i], thermalFile_out)
+        else: logging.warning("WARNING: File '" + str(thermalFile_out) + "' already esisting. --> NOT copied!")
 
-    if not os.path.isfile(rgbFile_out):
-        shutil.copyfile(rgbImages[i], rgbFile_out)
-    else: logging.warning("WARNING: File '" + str(rgbFile_out) + "' already esisting. --> NOT copied!")
+    if extractRgb:
+        if not os.path.isfile(rgbFile_out):
+            shutil.copyfile(rgbImages[i], rgbFile_out)
+        else: logging.warning("WARNING: File '" + str(rgbFile_out) + "' already esisting. --> NOT copied!")
 
     # Print progress status
     if 0 == i % progressOnePercent:
