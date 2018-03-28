@@ -31,7 +31,7 @@ annoRegex       = '.*.txt$'         # Used to find available annotations
 imageRegex      = 'frame_.*.png$'   # Used to find available images
 extractSetRegex = '.*\/set0[0-5]\/' # Specifies which sets to extract (Default: '.*\/set0[0-5]\/')
 splitThermRegex = '.*\/LWIR_V'      # Used to separate RGB- and thermal images
-logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 #############################################################
 
 
