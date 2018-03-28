@@ -1,6 +1,6 @@
 '''
     This script converts all annotations from the KAIST dataset to a compatible format for VOC
-    and exports them as .xml files into the output folder.
+    and exports them as .xml files into the output folder (renamed according to image name).
 
     Afterwards you can run "generateVocLists.py"
 
@@ -9,7 +9,10 @@
 
 from _usefulFunctions import *
 import os
+import logging
 
+
+##### Configurations ########################################
 ### *** HOME ***
 kaistFolder =   '/home/gueste/data/KAIST/data-kaist'
 outFolder =     '/home/gueste/data/KAIST/Annotations/'
@@ -17,23 +20,31 @@ outFolder =     '/home/gueste/data/KAIST/Annotations/'
 #kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
 #outFolder =     '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/Annotations/'
 
-dataToExtract = ['train-all20', 'test-all']
-excludeLabels = ['people', 'person?', 'cyclist']
+dataToExtract   = ['train-all-T', 'test-all']
+excludeLabels   = ['people', 'person?', 'cyclist']
+useThermal      = True  # If False, 'RGB_'-images will be extracted.
+
+logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+#############################################################
 
 
 if not os.path.isdir(outFolder):
-    print "Creating output directory '" + str(outFolder) + "' because it doesn't exist."
+    logging.info("Creating output directory '" + str(outFolder) + "' because it doesn't exist.")
     os.makedirs(outFolder)
 
 for folder in dataToExtract:
     annoFiles = dirRecursive(os.path.join(kaistFolder, folder, 'annotations') , '.*.txt$')
-    imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'T_.*.png$')  # "T_" --> Thermal
+    if useThermal:
+        imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'T_.*.png$')   # "T_" --> Thermal imag.
+    else:
+        imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'RGB_.*.png$') # "RGB_" --> Colored imag.
 
     for (i,fPath) in enumerate(annoFiles):
         _,imgName,_ = fileParts(imgFiles[i])
 
         with open(fPath) as f:
 
+            logging.debug("Generating file '" + str(outFolder + imgName + '.xml') + "'")
             with open(outFolder + imgName + '.xml', 'w') as outFile:
                 # write header
                 outFile.write('<annotation>\n\t<folder>KAIST</folder>\n')
