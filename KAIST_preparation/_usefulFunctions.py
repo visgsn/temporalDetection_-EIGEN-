@@ -38,7 +38,7 @@ def fileParts(fileWithPath):
 def dirRecursive(dirToSearch, regexToUse):
     '''
         This method takes a path which has to be searched through and a regex which is used to find files inside it
-        that match its pattern. A list of all matching files inside dirToSearch is returned.
+        that match its pattern. An alphabetically sorted list of all matching files inside dirToSearch is returned.
         
         HINT: To find files with a specific extension, e.g. '.py', use a regex like '.*.py$' to search from
         the end of the filenames.
@@ -59,4 +59,4 @@ def dirRecursive(dirToSearch, regexToUse):
                 # Add file to List
                 filesInFolder.append(fileWithPath)
 
-    return filesInFolder
+    return sorted(filesInFolder, key=str.lower)
