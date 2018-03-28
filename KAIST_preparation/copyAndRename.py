@@ -1,11 +1,12 @@
 '''
     This script is used to copy and rename the images and annotations from the KAIST dataset, which have previously
     been extracted with Pjotr's Matlab Toolbox. (By default only training data from set00 to set05)
-    Names are chosen according to the scheme of "train_all20".
+    Names are chosen according to the scheme of "train_all20" with one exception - instead of the unique ID at the
+    end of the generated file names, the last element of 'outputDir' is used as postfix (e.g. _train-all).
     Example for images:
-        T_tmp_set00_V000_I00019.png         (T_ stands for "thermal", RGB_ for color images)
+        T_tmp_set00_V000_I00019_train-all.png         (T_ stands for "thermal", RGB_ for color images)
     Example for annotations:
-        set00_V000_I00019.txt
+        set00_V000_I00019_train-all.txt
 '''
 
 from _usefulFunctions import *
@@ -19,7 +20,7 @@ import logging
 ### *** HOME ***
 annoDir     = "/home/gueste/data/KAIST/data-kaist/annotations-extracted"    # Input annotations
 imageDir    = "/home/gueste/data/KAIST/data-kaist/videos-extracted"         # Input images
-outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all"
+outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all"                # Last element of path used as data postfix!
 ### *** WORK ***
 # Insert config for WORK here...
 
@@ -116,6 +117,8 @@ for (i,list_entry) in enumerate(availableAnnos):
     extensionRgb = os.path.splitext(rgbImages[i])[1]
     logging.debug("ExtensionRgb: " + str(extensionRgb))
 
+    postfix = os.path.split(outputDir)[1]
+
     list_entry = os.path.split(list_entry[0])   # (path/setXX/VXXX, filename)
     temp_var = re.search('I([0-9]+)', list_entry[1])
     frameNr = temp_var.group(1)
@@ -139,9 +142,9 @@ for (i,list_entry) in enumerate(availableAnnos):
         sys.exit(1)
 
     # Wrap single parts together to one big filename for each filetype
-    nameAnno_tmp    = "{}_{}_I{}{}".format(set, subset, frameNr, extensionAnno)
-    nameThermal_tmp = "T_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionTherm)
-    nameRgb_tmp     = "RGB_tmp_{}_{}_I{}{}".format(set, subset, frameNr, extensionRgb)
+    nameAnno_tmp    = "{}_{}_I{}_{}{}".format(set, subset, frameNr, postfix, extensionAnno)
+    nameThermal_tmp = "T_tmp_{}_{}_I{}_{}{}".format(set, subset, frameNr, postfix, extensionTherm)
+    nameRgb_tmp     = "RGB_tmp_{}_{}_I{}_{}{}".format(set, subset, frameNr, postfix, extensionRgb)
     # Append names to lists
     nameAnno.append(nameAnno_tmp)
     nameThermal.append(nameThermal_tmp)
