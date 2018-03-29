@@ -1,7 +1,7 @@
 # You can modify the parameters in create_data.sh if needed.
 # It will create lmdb files for trainval and test with encoded original image:
-#   - $HOME/data/VOCdevkit/VOC0712/lmdb/VOC0712_trainval_lmdb
-#   - $HOME/data/VOCdevkit/VOC0712/lmdb/VOC0712_test_lmdb
+#   - $HOME/data/KAIST/ImageSets/lmdb/KAIST_trainval_lmdb
+#   - $HOME/data/KAIST/ImageSets/lmdb/KAIST_test_lmdb
 # and make soft links at examples/VOC0712/
 
 ##### CONFIGURATION ############################################################
