@@ -17,14 +17,12 @@ import logging
 
 ##### CONFIGURATION #######################################################
 ### *** HOME ***
-kaistFolder     = '/home/gueste/data/KAIST/data-kaist'
-outputFolder    = '/home/gueste/data/KAIST'
+kaistDataFolder = '/home/gueste/data/KAIST/data-kaist'
 ### *** WORK ***
-#kaistFolder     = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
-#outputFolder    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST'
+#kaistDataFolder = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
 
-trainImgSub     = 'train-all-T'     # Desired training subset of kaistFolder (Contains .png IMAGES!)
-testImgSub      = 'test-all'        # Desired test subset of kaistFolder (Contains .png IMAGES!)
+trainImgSub     = 'train-all-T'     # Desired training subset of kaistDataFolder (Contains .png IMAGES!)
+testImgSub      = 'test-all'        # Desired test subset of kaistDataFolder (Contains .png IMAGES!)
 
 useThermal      = True              # If False, 'RGB_'-images will be extracted.
 regexThermal    = 'T_.*.png$'
@@ -34,9 +32,11 @@ logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:
 ###########################################################################
 
 
-
-trainFolder = os.path.join(kaistFolder, trainImgSub, "images")
-testFolder = os.path.join(kaistFolder, testImgSub, "images")
+outputFolder    = os.path.split(kaistDataFolder)[0]
+trainFolder     = os.path.join(kaistDataFolder, trainImgSub, "images")
+trainFolder_rel = os.path.relpath(trainFolder, outputFolder)
+testFolder      = os.path.join(kaistDataFolder, testImgSub, "images")
+testFolder_rel  = os.path.relpath(testFolder, outputFolder)
 
 
 # Create trainval.txt
@@ -59,8 +59,8 @@ with open(trainValFileName, 'w+') as trainValFile:
     for filename in files:    # List of all files in trainFolder
         _,filename,_ = fileParts(filename)
         if os.path.splitext(filename)[1] != '.db':
-            trainValFile.write(trainFolder + '/' + filename + '.png ')
-            trainValFile.write(outputFolder + '/Annotations/' + filename + '.xml')
+            trainValFile.write(trainFolder_rel + '/' + filename + '.png ')
+            trainValFile.write('Annotations/' + filename + '.xml')
             trainValFile.write("\n")
 
 
@@ -84,8 +84,8 @@ with open(testFileName, 'w+') as testFile:
     for filename in files:     # List of all files in testFolder
         _,filename,_ = fileParts(filename)
         if os.path.splitext(filename)[1] != '.db':
-            testFile.write(testFolder + '/' + filename + '.png ')
-            testFile.write(outputFolder + '/Annotations/' + filename + '.xml')
+            testFile.write(testFolder_rel + '/' + filename + '.png ')
+            testFile.write('Annotations/' + filename + '.xml')
             testFile.write("\n")
 
 print "\n\n"
