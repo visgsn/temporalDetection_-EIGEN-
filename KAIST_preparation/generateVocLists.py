@@ -1,6 +1,6 @@
 '''
-    This script creates trainval.txt and test.txt, which contain the links between images and their
-    corresponding annotations.
+    This script creates trainval.txt, test.txt and test_name_size.txt, which contain the links between images and their
+    corresponding annotations, as well as image size information.
     
     To use this script, first run "convertAnnotations.py" to convert the necessary Annotations
     from the kaist-data sub-folder into the KAIST folder (target format: .xml).
@@ -12,7 +12,7 @@
 from _usefulFunctions import *
 import os
 import logging
-#import random
+from PIL import Image
 
 
 ##### CONFIGURATION #######################################################
@@ -57,23 +57,25 @@ with open(trainValFileName, 'w+') as trainValFile:
         files = dirRecursive(trainFolder, regexRgb)     # "RGB_" --> Colored imag.
 
     for filename in files:    # List of all files in trainFolder
-        _,filename,_ = fileParts(filename)
         if os.path.splitext(filename)[1] != '.db':
+            _,filename,_ = fileParts(filename)
             trainValFile.write(trainFolder_rel + '/' + filename + '.png ')
             trainValFile.write('Annotations/' + filename + '.xml')
             trainValFile.write("\n")
 
 
-# Create test.txt
+# Create test.txt AND test_name_size.txt
 testFileName = os.path.join(outputFolder, "ImageSets/Main/test.txt")
 testFilePath = os.path.split(trainValFileName)[0]
-logging.info("Creating test file: " + str(testFileName))
+nameSizeFileName = os.path.join(testFilePath, "test_name_size.txt")
+logging.info("Creating test file:  " + str(testFileName) + " and\n" + \
+             "test_name_size file: " + str(nameSizeFileName))
 
 if not os.path.isdir(testFilePath):
     logging.info("Creating output directory '" + str(testFilePath) + "' because it doesn't exist.")
     os.makedirs(testFilePath)
 
-with open(testFileName, 'w+') as testFile:
+with open(testFileName, 'w+') as testFile, open(nameSizeFileName, 'w+') as nameSizeFile:
     if useThermal:
         logging.info("Using THERMAL images from: " + str(testFolder))
         files = dirRecursive(testFolder, regexThermal)  # "T_" --> Thermal imag.
@@ -82,11 +84,21 @@ with open(testFileName, 'w+') as testFile:
         files = dirRecursive(testFolder, regexRgb)      # "RGB_" --> Colored imag.
 
     for filename in files:     # List of all files in testFolder
-        _,filename,_ = fileParts(filename)
         if os.path.splitext(filename)[1] != '.db':
+            # Get image size
+            im = Image.open(filename)
+            width, height = im.size
+            # Separate file name
+            _,filename,_ = fileParts(filename)
+
+            # Write test file
             testFile.write(testFolder_rel + '/' + filename + '.png ')
             testFile.write('Annotations/' + filename + '.xml')
             testFile.write("\n")
+            # Write test_name_size file
+            nameSizeFile.write(filename + " " + str(height) + " " + str(width))
+            nameSizeFile.write("\n")
+
 
 print "\n\n"
 logging.info("DONE")

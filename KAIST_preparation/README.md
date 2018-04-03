@@ -28,9 +28,9 @@ Please execute the following steps in the given order:
     and exports them as .xml files into the output folder (renamed according to image name).
     --> Check paths before execution!
 
-4.  generateVocList.py:
-    This script creates trainval.txt and test.txt, which contain the links between images and their
-    corresponding annotations.
+4.  generateVocLists.py:
+    This script creates trainval.txt, test.txt and test_name_size.txt, which contain the links between images and their
+    corresponding annotations, as well as image size information.
     To use this script, first run "convertAnnotations.py" to convert the necessary Annotations
     from the 'kaist-data' sub-folder into the KAIST folder (target format: .xml).
     IMPORTANT: Check paths before execution!
