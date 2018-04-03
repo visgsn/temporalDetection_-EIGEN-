@@ -9,6 +9,7 @@
 
 from _usefulFunctions import *
 import os
+import sys
 import logging
 
 
@@ -18,7 +19,7 @@ kaistFolder =   '/home/gueste/data/KAIST/data-kaist'
 ### *** WORK ***
 #kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
 
-dataToExtract   = ['train-all-T', 'test-all']
+dataToExtract   = ['test-all', 'train-all-T']
 excludeLabels   = ['people', 'person?', 'cyclist']
 useThermal      = True  # If False, 'RGB_'-images will be extracted.
 
@@ -33,14 +34,30 @@ if not os.path.isdir(outFolder):
     os.makedirs(outFolder)
 
 for folder in dataToExtract:
-    annoFiles = dirRecursive(os.path.join(kaistFolder, folder, 'annotations') , '.*.txt$')
+    annoFiles = dirRecursive(os.path.join(kaistFolder, folder, 'annotations'), '.*.txt$')
     if useThermal:
         imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'T_.*.png$')   # "T_" --> Thermal imag.
     else:
         imgFiles = dirRecursive(os.path.join(kaistFolder, folder, 'images'), 'RGB_.*.png$') # "RGB_" --> Colored imag.
 
     for (i,fPath) in enumerate(annoFiles):
-        _,imgName,_ = fileParts(imgFiles[i])
+        pa,imgName,ex = fileParts(imgFiles[i])
+
+        # Check if imgFile name contains whitespaces (If true: Rename file!)
+        if " " in imgName:
+            imgName_new = imgName.replace(' ', '')
+            logging.info("File name contains whitespaces ('" + str(imgFiles[i]) + "') --> renaming file!\n" + \
+                         "OLD: " + str(imgFiles[i]) + "\n" + \
+                         "NEW: " + str(os.path.join(pa, imgName_new + ex)))
+            os.rename(imgFiles[i], os.path.join(pa, imgName_new + ex))
+            imgName = imgName_new[:]
+        # Check if path contains any whitespaces (Abort if true!)
+        elif " " in imgFiles[i] or " " in fPath:
+            logging.error("ERROR: Path to File contains whitespace(s). Please remove and rerun this script!" + \
+                         "(" + str(imgFiles[i]) + "  OR  " + str(fPath) + ")")
+            sys.exit()
+
+        continue
 
         with open(fPath) as f:
 
