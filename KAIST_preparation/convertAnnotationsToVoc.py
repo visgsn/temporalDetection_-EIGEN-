@@ -57,8 +57,6 @@ for folder in dataToExtract:
                          "(" + str(imgFiles[i]) + "  OR  " + str(fPath) + ")")
             sys.exit()
 
-        continue
-
         with open(fPath) as f:
 
             logging.debug("Generating file '" + str(outFolder + imgName + '.xml') + "'")
