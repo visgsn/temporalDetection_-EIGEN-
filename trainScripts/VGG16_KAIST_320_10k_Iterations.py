@@ -76,14 +76,18 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
     return net
 
 
-### Modify the following parameters accordingly ###
+############## Modify the following parameters accordingly ##############
 # The directory which contains the caffe code.
-# We assume you are running the script at the CAFFE_ROOT.
-#caffe_root = os.getcwd()                                   # ORIGINAL
 caffe_root = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
+# Define Dataset name to train on
+dataset_name = "KAIST"
+### *** HOME ***
+dataset_root = "{}/data/{}".format(os.environ['HOME'], dataset_name)
+### *** WORK ***
+#dataset_root = "/net4/merkur/storage/deeplearning/users/gueste/data/{}".format(dataset_name)                            # Check if correct!!!
 
 # Set true if you want to start training right after generating all files.
-run_soon = False                                                                # Change back to True!!!
+run_soon = True                                                                # Change back to True!!!
 # Set true if you want to load from most recently saved snapshot.
 # Otherwise, we will load from the pretrain_model defined below.
 #resume_training = True                                                         # ORIGINAL
@@ -92,12 +96,11 @@ resume_training = False
 #remove_old_models = False                                                       # ORIGINAL
 remove_old_models = False
 
-# The database file for training data. Created by data/VOC0712/create_data.sh
-#train_data = "examples/VOC0712/VOC0712_trainval_lmdb"                           # ORIGINAL
-train_data = "{}/examples/VOC0712/VOC0712_trainval_lmdb".format(caffe_root)
-# The database file for testing data. Created by data/VOC0712/create_data.sh
-#test_data = "examples/VOC0712/VOC0712_test_lmdb"                                # ORIGINAL
-test_data = "{}/examples/VOC0712/VOC0712_test_lmdb".format(caffe_root)
+# The database file for training data. Created by create_data.sh
+train_data = "{}/examples/{}/{}_trainval_lmdb".format(caffe_root, dataset_name, dataset_name)
+# The database file for testing data. Created by create_data.sh
+test_data = "{}/examples/{}/{}_test_lmdb".format(caffe_root, dataset_name, dataset_name)
+
 # Specify the batch sampler.
 resize_width = 320
 resize_height = 320
@@ -248,38 +251,35 @@ else:
     base_lr = 0.00004
 
 # Modify the job name if you want.
-job_name = "refinedet_vgg16_{}".format(resize)
+job_name = "refinedet_vgg16_{}".format(resize)                                  # Adapt to own net name!!!
 # The name of the model. Modify it if you want.
-model_name = "VOC0712_{}".format(job_name)
+model_name = "{}_{}".format(dataset_name, job_name)
 
 
 
-### Directory prefix for save_dir, snapshot_dir and job_dir!
+############## Directory prefix for save_dir, snapshot_dir and job_dir! ##############
 # *** HOME ***
-#prefix_saveSnapJob = "{}/train_test_data".format(os.environ['HOME'])
+prefix_saveSnapJob = "{}/train_test_data".format(os.environ['HOME'])
 # *** WORK ***
-prefix_saveSnapJob = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+#prefix_saveSnapJob = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
 ### Directory prefix for output_result_dir!
 # *** HOME ***
-#prefix_outputResultDir = "{}/data".format(os.environ['HOME'])
+prefix_outputResultDir = "{}/data".format(os.environ['HOME'])
 # *** WORK ***
-prefix_outputResultDir = "/net4/merkur/storage/deeplearning/users/gueste/data"
+#prefix_outputResultDir = "/net4/merkur/storage/deeplearning/users/gueste/data"
 
 
 
 # Directory which stores the model .prototxt file.
-#save_dir = "models/VGGNet/VOC0712/{}".format(job_name)                         # ORIGINAL
-save_dir = "{}/models/VGGNet/VOC0712/{}".format(prefix_saveSnapJob, job_name)
+save_dir = "{}/models/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
 # Directory which stores the snapshot of models.
-#snapshot_dir = "models/VGGNet/VOC0712/{}".format(job_name)                     # ORIGINAL
-snapshot_dir = "{}/models/VGGNet/VOC0712/{}".format(prefix_saveSnapJob, job_name)
+snapshot_dir = "{}/models/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
 # Directory which stores the job script and log file.
-#job_dir = "jobs/VGGNet/VOC0712/{}".format(job_name)                            # ORIGINAL
-job_dir = "{}/jobs/VGGNet/VOC0712/{}".format(prefix_saveSnapJob, job_name)
+job_dir = "{}/jobs/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
 # Directory which stores the detection results.
 #output_result_dir = "{}/data/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)   # ORIGINAL
-output_result_dir = "{}/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(prefix_outputResultDir, job_name)
+output_result_dir = "{}/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(prefix_outputResultDir, job_name)    # NOT used?!?
 
 # model definition files.
 train_net_file = "{}/train.prototxt".format(save_dir)
@@ -291,18 +291,19 @@ snapshot_prefix = "{}/{}".format(snapshot_dir, model_name)
 # job script path.
 job_file = "{}/{}.sh".format(job_dir, model_name)
 
-# Stores the test image names and sizes. Created by data/VOC0712/create_list.sh
+# Stores the test image names and sizes. Created by create_list.sh
 #name_size_file = "data/VOC0712/test_name_size.txt"                              # ORIGINAL
-name_size_file = "{}/data/VOC0712/test_name_size.txt".format(caffe_root)
+name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, dataset_name)
+# Stores LabelMapItem.
+#label_map_file = "data/VOC0712/labelmap_voc.prototxt"                           # ORIGINAL
+label_map_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
 #pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"     # ORIGINAL
 pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
-# Stores LabelMapItem.
-#label_map_file = "data/VOC0712/labelmap_voc.prototxt"                           # ORIGINAL
-label_map_file = "{}/data/VOC0712/labelmap_voc.prototxt".format(caffe_root)
 
 # MultiBoxLoss parameters.
-num_classes = 21
+#num_classes = 21                                                                # ORIGINAL
+num_classes = 2
 share_location = True
 background_label_id = 0
 train_on_diff_gt = True
@@ -359,16 +360,16 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-#gpus = "0"                                  # ORIGINAL
-gpus = str(sys.argv[1])                     #Adapted to use with script "StartIfGPUFree.py"
+gpus = "0"                                  # ORIGINAL
+#gpus = str(sys.argv[1])                     #Adapted to use with script "StartIfGPUFree.py"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
 # Divide the mini-batch to different GPUs.
 #batch_size = 32                             # ORIGINAL
-batch_size = 26
+batch_size = 8                             # Work: 26, Home: 8
 #accum_batch_size = 32                       # ORIGINAL
-accum_batch_size = 26
+accum_batch_size = 8                       # Work: 26, Home: 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -389,23 +390,23 @@ elif normalization_mode == P.Loss.FULL:
   base_lr *= 2000.
 
 # Evaluate on whole test set.
-num_test_image = 4952
 test_batch_size = 1
-test_iter = num_test_image / test_batch_size
+num_test_image = 4952                           # NOT used!
+test_iter = num_test_image / test_batch_size    # NOT used!
 
 solver_param = {
     # Train parameters
     'base_lr': base_lr,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [60000, 80000, 100000],
+    'stepvalue': [50000, 70000, 90000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
     #'max_iter': 120000,                # ORIGINAL
-    'max_iter': 10000,
+    'max_iter': 10000,                 # 100368 --> 2x all KAIST train images
     #'snapshot': 5000,                  # ORIGINAL
-    'snapshot': 2500,
+    'snapshot': 5000,
     'display': 10,
     'average_loss': 10,
     'type': "SGD",
