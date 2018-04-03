@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # You can modify the parameters in create_data.sh if needed.
 # It will create lmdb files for trainval and test with encoded original image:
 #   - $HOME/data/KAIST/ImageSets/lmdb/KAIST_trainval_lmdb
@@ -16,15 +18,15 @@ height=0
 extra_cmd="--encode-type=png --encoded"                                         # png?!?
 
 ### *** HOME ***
-RefineDet_ROOT  = "$HOME/code/caffe/RefineDet"
-tmpDetRepo_ROOT = "$HOME/code/temporalDetection_(EIGEN)"
-data_root_dir   = "$HOME/data/KAIST"
+RefineDet_ROOT="$HOME/code/caffe/RefineDet"
+tmpDetRepo_ROOT="$HOME/code/temporalDetection_(EIGEN)"
+data_root_dir="$HOME/data/KAIST"
 ### *** WORK ***
-#RefineDet_ROOT  = "$HOME/code/caffe/RefineDet"
-#tmpDetRepo_ROOT = "$HOME/code/temporalDetection_(EIGEN)"
-#data_root_dir   = "/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/"     # CHECK this!!!
+#RefineDet_ROOT="$HOME/code/caffe/RefineDet"
+#tmpDetRepo_ROOT="$HOME/code/temporalDetection_(EIGEN)"
+#data_root_dir="/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/"     # CHECK this!!!
 
-mapfile         = "$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
+mapfile="$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
 ################################################################################
 
 
