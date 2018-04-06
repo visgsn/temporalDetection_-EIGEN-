@@ -59,7 +59,7 @@ def ShowResults(img, image_file, results, labelmap, threshold=0.6, save_fig=Fals
         ymin = int(round(results[i, 1]))
         xmax = int(round(results[i, 2]))
         ymax = int(round(results[i, 3]))
-        coords = (xmin, ymin), xmax - xmin, ymax - ymin
+        coords = (xmin, ymin), xmax - xmin, ymax - ymin     # coords = upper_left_edge, width, height (of rectangle)
         ax.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=3))
         display_text = '%s: %.2f' % (name, score)
         ax.text(xmin, ymin, display_text, bbox={'facecolor':color, 'alpha':0.5})
