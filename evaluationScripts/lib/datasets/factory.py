@@ -5,13 +5,36 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-"""Factory method for easily getting imdbs by name."""
+"""
+Factory method for easily getting imdbs by name.
+Update this file and KAIST_py if a new dataset should be used.
+"""
 
 __sets = {}
 
+from datasets.kaist import kaist
 from datasets.pascal_voc import pascal_voc
 from datasets.coco import coco
 import numpy as np
+
+
+##### CONFIGURATION ####################################################################################################
+kaist_subsets = ['train-all-T'] # List of all (converted) KAIST-subsets
+
+### *** HOME ***
+kaist_path = '{}/data/KAIST'.format(os.environ['HOME'])
+### *** WORK ***
+#kaist_path = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST'
+########################################################################################################################
+
+
+# Set up KAIST_<subset_name>_<split> using selective search "fast" mode
+for subset_name in kaist_subsets:
+    for split in ['trainval', 'test']:
+        name = 'kaist_{}_{}'.format(subset_name, split)
+        __sets[name] = (lambda split=split, subset_name=subset_name, kaist_path=kaist_path: \
+                            kaist(split, subset_name, kaist_path=kaist_path))
+
 
 # Set up voc_<year>_<split> using selective search "fast" mode
 for year in ['2007', '2012', '0712']:
