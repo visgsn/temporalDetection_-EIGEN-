@@ -1,3 +1,12 @@
+'''
+    This is the main script for testing the trained KAIST net.
+    
+    Usage: python KAIST_test.py <GPU-ID for testing>
+    IMPORTANT: Also adapt kaist_path path in ./lib/datasets/factory.py
+    
+    Written by Steffen Guentert
+'''
+
 import _init_paths
 from fast_rcnn.test import single_scale_test_net, multi_scale_test_net_320, multi_scale_test_net_512
 from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
@@ -9,17 +18,17 @@ import sys
 if __name__ == '__main__':
     ##### CONFIGURATION ################################################################################################
     ### *** HOME ***
-    GPU_ID = 0
     path_prefix = "{}/train_test_data".format(os.environ['HOME'])
     ### *** WORK ***
-    #GPU_ID = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
     #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
-    test_set = 'voc_2007_test' # 'voc_2007_test' or 'voc_2012_test' or 'coco_2014_minival' or 'coco_2015_test-dev'
+    kaist_path = '{}/models/VGGNet/KAIST/refinedet_vgg16_320x320/'.format(path_prefix)
+    test_set = 'kaist_train-all-T_test' # Available: 'kaist_Train-all-T_test' or ...    # See --> factory.py for all
     single_scale = True # True: single scale test;  False: multi scale test
-    ####################################################################################################################
+    GPU_ID = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
-    kaist_path = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320/'.format(path_prefix)
+    logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+    ####################################################################################################################
 
     cfg.single_scale_test = single_scale
 
