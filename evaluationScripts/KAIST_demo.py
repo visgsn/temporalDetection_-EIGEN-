@@ -10,14 +10,11 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import skimage.io as io
-
 # Make sure that caffe is on the python path:
-#caffe_root = './'                                                  # ORIGINAL
 caffe_root = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
 os.chdir(caffe_root)
 sys.path.insert(0, os.path.join(caffe_root, 'python'))
 import caffe
-
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
 
@@ -68,32 +65,38 @@ def ShowResults(img, image_file, results, labelmap, threshold=0.6, save_fig=Fals
     plt.show()
 
 if __name__ == '__main__':
-    # gpu preparation
+    ##### CONFIGURATION ################################################################################################
     ### *** HOME ***
-    #gpu_id = 0
+    path_prefix     = "{}/train_test_data".format(os.environ['HOME'])
+    file_postfix    = "iter_10000"  # Select which trained state to use
     ### *** WORK ***
+    #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+    #file_postfix = "iter_120000"  # Select which trained state to use
+
+    subsetName  = "train-all-T"
+    job_name    = "refinedet_vgg16_320x320"
+
+    dataset_name = "KAIST"
+    labelmap_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
+    ####################################################################################################################
+
+    kaist_path      = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
+    model_def       = os.path.join(kaist_path, 'deploy.prototxt')
+    model_weights   = os.path.join(kaist_path, '{}_{}_{}.caffemodel'.format(dataset_name, job_name, file_postfix) )
+
+    # gpu preparation
     gpu_id = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     caffe.set_device(gpu_id)
     caffe.set_mode_gpu()
 
     # load labelmap
-    labelmap_file = 'data/VOC0712/labelmap_voc.prototxt'
+    #labelmap_file = 'data/VOC0712/labelmap_voc.prototxt'    # ORIGINAL
     file = open(labelmap_file, 'r')
     labelmap = caffe_pb2.LabelMap()
     text_format.Merge(str(file.read()), labelmap)
 
     # load model
-    ### *** HOME ***
-    #path_prefix = "{}/train_test_data".format(os.environ['HOME'])
-    #file_postfix = "iter_10000"
-    ### *** WORK ***
-    path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
-    file_postfix = "iter_120000"    # Select which trained state to use?!?
-
-    model_def = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320/deploy.prototxt'.format(path_prefix)
-    model_weights = '{}/models/VGGNet/VOC0712/refinedet_vgg16_320x320'.format(path_prefix) + \
-                    '/VOC0712_refinedet_vgg16_320x320_{}.caffemodel'.format(file_postfix)
     net = caffe.Net(model_def, model_weights, caffe.TEST)
 
     # image preprocessing
