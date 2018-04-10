@@ -13,6 +13,7 @@ from _usefulFunctions import *
 import os
 import logging
 from PIL import Image
+from random import shuffle
 
 
 ##### CONFIGURATION ####################################################################################################
@@ -25,6 +26,7 @@ trainImgSub     = 'train-all-T'     # Desired training subset of kaistDataFolder
 testImgSub      = 'test-all'        # Desired test subset of kaistDataFolder (Contains .png IMAGES!)
 
 useThermal      = True              # If False, 'RGB_'-images will be extracted.
+shuffleFiles    = True              # Randomize order of train images
 regexThermal    = 'T_.*.png$'
 regexRgb        = 'RGB_.*.png$'
 
@@ -57,6 +59,10 @@ with open(trainValFileName, 'w+') as trainValFile:
     else:
         logging.info("Using RGB images from: " + str(trainFolder))
         files = dirRecursive(trainFolder, regexRgb)     # "RGB_" --> Colored imag.
+
+    # Shuffle train images?
+    logging.info("Randomize train image order: " + ("YES" if shuffleFiles else "NO") + "\n")
+    if shuffleFiles: shuffle(files)
 
     for filename in files:    # List of all files in trainFolder
         if os.path.splitext(filename)[1] != '.db':
@@ -102,5 +108,5 @@ with open(testFileName, 'w+') as testFile, open(nameSizeFileName, 'w+') as nameS
             nameSizeFile.write("\n")
 
 
-print "\n\n"
+print "\n"
 logging.info("DONE")
