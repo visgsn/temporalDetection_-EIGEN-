@@ -2,7 +2,7 @@
     This is the main script for testing the trained KAIST net.
     
     Usage: python KAIST_test.py <GPU-ID for testing>
-    IMPORTANT: Also adapt kaist_path path in ./lib/datasets/factory.py
+    IMPORTANT: Also adapt kaist_path path AND kaist_subsets in ./lib/datasets/factory.py
     
     Written by Steffen Guentert
 '''
@@ -14,6 +14,7 @@ from datasets.factory import get_imdb
 import caffe
 import os
 import sys
+import logging
 
 if __name__ == '__main__':
     ##### CONFIGURATION ################################################################################################
@@ -22,13 +23,17 @@ if __name__ == '__main__':
     ### *** WORK ***
     #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
-    kaist_path = '{}/models/VGGNet/KAIST/refinedet_vgg16_320x320/'.format(path_prefix)
-    test_set = 'kaist_train-all-T_test' # Available: 'kaist_Train-all-T_test' or ...    # See --> factory.py for all
+    subsetName  = "train-all-T"
+    job_name    = "refinedet_vgg16_320x320"
     single_scale = True # True: single scale test;  False: multi scale test
-    GPU_ID = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    GPU_ID = int(sys.argv[1])   # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
     ####################################################################################################################
+
+
+    kaist_path = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
+    test_set = 'kaist_{}_test'.format(subsetName) # Available: 'kaist_Train-all-T_test' or ... (See --> factory.py for all)
 
     cfg.single_scale_test = single_scale
 
