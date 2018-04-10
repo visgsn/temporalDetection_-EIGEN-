@@ -414,10 +414,11 @@ solver_param = {
     #'max_iter': 120000,                # ORIGINAL
     'max_iter': 10000,                 # 100368 --> 2x all KAIST train images
     #'snapshot': 5000,                  # ORIGINAL
-    'snapshot': 5000,
+    'snapshot': 500,
     'display': 10,
     'average_loss': 10,
-    'type': "SGD",
+    'type': "SGD",                      # ORIGINAL
+    #'type': "Adam",
     'solver_mode': solver_mode,
     'device_id': device_id,
     'debug_info': False,
