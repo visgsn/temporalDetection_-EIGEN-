@@ -13,21 +13,21 @@ import sys
 import logging
 
 
-##### Configurations ########################################
+##### Configurations ###################################################################################################
 ### *** HOME ***
 kaistFolder =   '/home/gueste/data/KAIST/data-kaist'
 ### *** WORK ***
 #kaistFolder =   '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist/'
 
-dataToExtract   = ['test-all', 'train-all-T']
+dataToExtract   = ['train-all-T', 'test-all']   # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
 excludeLabels   = ['people', 'person?', 'cyclist']
 useThermal      = True  # If False, 'RGB_'-images will be extracted.
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
-#############################################################
+########################################################################################################################
 
 
-outFolder = os.path.join(os.path.split(kaistFolder)[0], 'Annotations/')
+outFolder = os.path.join(os.path.split(kaistFolder)[0], dataToExtract[0], 'Annotations/')
 
 if not os.path.isdir(outFolder):
     logging.info("Creating output directory '" + str(outFolder) + "' because it doesn't exist.")
