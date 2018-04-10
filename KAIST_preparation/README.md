@@ -32,13 +32,13 @@ Please execute the following steps in the given order:
     This script creates trainval.txt, test.txt and test_name_size.txt, which contain the links between images and their
     corresponding annotations, as well as image size information.
     To use this script, first run "convertAnnotations.py" to convert the necessary Annotations
-    from the 'kaist-data' sub-folder into the KAIST folder (target format: .xml).
-    IMPORTANT: Check paths before execution!
-               "outputFolder" has to be the location of the previously generated "Annotations" folder!
+    from the kaist-data sub-folder into the KAIST folder (target format: .xml).
+    IMPORTANT: Check paths below before execution!
+               "kaistDataFolder" has to point to the location of the "data-kaist" folder inside KAIST!!!
 
 5.  createData.sh:
     You can modify the parameters in create_data.sh if needed.
     It will create lmdb files for trainval and test with encoded original image:
-      - $HOME/data/KAIST/ImageSets/lmdb/KAIST_trainval_lmdb
-      - $HOME/data/KAIST/ImageSets/lmdb/KAIST_test_lmdb
+     - $HOME/data/KAIST/<trainsetName>/ImageSets/lmdb/KAIST_trainval_lmdb
+     - $HOME/data/KAIST/<trainsetName>/ImageSets/lmdb/KAIST_test_lmdb
     and make soft links at examples/VOC0712/
