@@ -1,3 +1,10 @@
+'''
+    This script is used to train RefineDet on KAIST dataset
+    
+    Usage: python VGG16_KAIST_320_10k_Iterations.py <GPU-ID to train on>
+'''
+
+
 from __future__ import print_function
 import sys
 sys.path.append("./python")
@@ -78,9 +85,10 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 
 ############## Modify the following parameters accordingly ##############
 # The directory which contains the caffe code.
-caffe_root = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
+caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
 # Define Dataset name to train on
-dataset_name = "KAIST"
+dataset_name    = "KAIST"
+subsetName      = "train-all-T"
 ### *** HOME ***
 dataset_root = "{}/data/{}".format(os.environ['HOME'], dataset_name)
 ### *** WORK ***
@@ -97,9 +105,9 @@ resume_training = False
 remove_old_models = False
 
 # The database file for training data. Created by create_data.sh
-train_data = "{}/examples/{}/{}_trainval_lmdb".format(caffe_root, dataset_name, dataset_name)
+train_data = "{}/examples/{}/{}/{}_trainval_lmdb".format(caffe_root, dataset_name, subsetName, dataset_name)
 # The database file for testing data. Created by create_data.sh
-test_data = "{}/examples/{}/{}_test_lmdb".format(caffe_root, dataset_name, dataset_name)
+test_data = "{}/examples/{}/{}/{}_test_lmdb".format(caffe_root, dataset_name, subsetName, dataset_name)
 
 # Specify the batch sampler.
 resize_width = 320
@@ -251,7 +259,7 @@ else:
     base_lr = 0.00004
 
 # Modify the job name if you want.
-job_name = "refinedet_vgg16_{}".format(resize)                                  # Adapt to own net name!!!
+job_name = "refinedet_vgg16_{}".format(resize)                                                                          # Adapt to own net name!!!
 # The name of the model. Modify it if you want.
 model_name = "{}_{}".format(dataset_name, job_name)
 
@@ -263,7 +271,7 @@ prefix_saveSnapJob = "{}/train_test_data".format(os.environ['HOME'])
 # *** WORK ***
 #prefix_saveSnapJob = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
-### Directory prefix for output_result_dir!
+### Directory prefix for output_result_dir!                                                                             # NOT used?!?
 # *** HOME ***
 prefix_outputResultDir = "{}/data".format(os.environ['HOME'])
 # *** WORK ***
@@ -272,14 +280,14 @@ prefix_outputResultDir = "{}/data".format(os.environ['HOME'])
 
 
 # Directory which stores the model .prototxt file.
-save_dir = "{}/models/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
+save_dir = "{}/models/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, subsetName, job_name)
 # Directory which stores the snapshot of models.
-snapshot_dir = "{}/models/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
+snapshot_dir = "{}/models/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, subsetName, job_name)
 # Directory which stores the job script and log file.
-job_dir = "{}/jobs/VGGNet/{}/{}".format(prefix_saveSnapJob, dataset_name, job_name)
+job_dir = "{}/jobs/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, subsetName, job_name)
 # Directory which stores the detection results.
 #output_result_dir = "{}/data/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)   # ORIGINAL
-output_result_dir = "{}/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(prefix_outputResultDir, job_name)    # NOT used?!?
+#output_result_dir = "{}/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(prefix_outputResultDir, job_name)    # NOT used?!?
 
 # model definition files.
 train_net_file = "{}/train.prototxt".format(save_dir)
@@ -293,7 +301,7 @@ job_file = "{}/{}.sh".format(job_dir, model_name)
 
 # Stores the test image names and sizes. Created by create_list.sh
 #name_size_file = "data/VOC0712/test_name_size.txt"                              # ORIGINAL
-name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, dataset_name)
+name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, subsetName)
 # Stores LabelMapItem.
 #label_map_file = "data/VOC0712/labelmap_voc.prototxt"                           # ORIGINAL
 label_map_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
@@ -360,8 +368,8 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-gpus = "0"                                  # ORIGINAL
-#gpus = str(sys.argv[1])                     #Adapted to use with script "StartIfGPUFree.py"
+#gpus = "0"                                  # ORIGINAL
+gpus = str(sys.argv[1])                     #Adapted to use with script "StartIfGPUFree.py"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
