@@ -16,6 +16,7 @@ from datasets.kaist import kaist
 from datasets.pascal_voc import pascal_voc
 from datasets.coco import coco
 import numpy as np
+import os
 
 
 ##### CONFIGURATION ####################################################################################################
