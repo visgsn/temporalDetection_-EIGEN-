@@ -6,7 +6,7 @@
     from the kaist-data sub-folder into the KAIST folder (target format: .xml).
 
     IMPORTANT: Check paths below before execution!
-               "outputFolder" has to be the location of the previously generated "Annotations" folder!!!
+               "kaistDataFolder" has to point to the location of the "data-kaist" folder inside KAIST!!!
 '''
 
 from _usefulFunctions import *
@@ -15,7 +15,7 @@ import logging
 from PIL import Image
 
 
-##### CONFIGURATION #######################################################
+##### CONFIGURATION ####################################################################################################
 ### *** HOME ***
 kaistDataFolder = '/home/gueste/data/KAIST/data-kaist'
 ### *** WORK ***
@@ -29,14 +29,16 @@ regexThermal    = 'T_.*.png$'
 regexRgb        = 'RGB_.*.png$'
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
-###########################################################################
+########################################################################################################################
 
 
-outputFolder    = os.path.split(kaistDataFolder)[0]
-trainFolder     = os.path.join(kaistDataFolder, trainImgSub, "images")
-trainFolder_rel = os.path.relpath(trainFolder, outputFolder)
-testFolder      = os.path.join(kaistDataFolder, testImgSub, "images")
-testFolder_rel  = os.path.relpath(testFolder, outputFolder)
+kaistRoot           = os.path.split(kaistDataFolder)[0]
+outputFolder        = os.path.join(kaistRoot, trainImgSub)
+outputFolder_rel    = os.path.relpath(outputFolder, kaistRoot)
+trainFolder         = os.path.join(kaistDataFolder, trainImgSub, "images")
+trainFolder_rel     = os.path.relpath(trainFolder, kaistRoot)
+testFolder          = os.path.join(kaistDataFolder, testImgSub, "images")
+testFolder_rel      = os.path.relpath(testFolder, kaistRoot)
 
 
 # Create trainval.txt
@@ -60,7 +62,7 @@ with open(trainValFileName, 'w+') as trainValFile:
         if os.path.splitext(filename)[1] != '.db':
             _,filename,_ = fileParts(filename)
             trainValFile.write(trainFolder_rel + '/' + filename + '.png ')
-            trainValFile.write('Annotations/' + filename + '.xml')
+            trainValFile.write(outputFolder_rel + '/Annotations/' + filename + '.xml')
             trainValFile.write("\n")
 
 
@@ -93,7 +95,7 @@ with open(testFileName, 'w+') as testFile, open(nameSizeFileName, 'w+') as nameS
 
             # Write test file
             testFile.write(testFolder_rel + '/' + filename + '.png ')
-            testFile.write('Annotations/' + filename + '.xml')
+            testFile.write(outputFolder_rel + '/Annotations/' + filename + '.xml')
             testFile.write("\n")
             # Write test_name_size file
             nameSizeFile.write(filename + " " + str(height) + " " + str(width))
