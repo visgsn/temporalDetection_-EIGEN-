@@ -39,5 +39,5 @@ then
 fi
 for subset in trainval test
 do                                                                                                                                                                                                               #--root_dir    #--list_file                                            #--out_dir                                                               #--example_dir
-  python $RefineDet_ROOT/scripts/create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir $data_root_dir/$trainsetName/ImageSets/Main/$subset.txt $data_root_dir/$trainsetName/ImageSets/$db/$dataset_name"_"$subset"_"$db examples/$dataset_name
+  python $RefineDet_ROOT/scripts/create_annoset.py --anno-type=$anno_type --label-map-file=$mapfile --min-dim=$min_dim --max-dim=$max_dim --resize-width=$width --resize-height=$height --check-label $extra_cmd $data_root_dir $data_root_dir/$trainsetName/ImageSets/Main/$subset.txt $data_root_dir/$trainsetName/ImageSets/$db/$dataset_name"_"$subset"_"$db examples/$dataset_name/$trainsetName
 done
