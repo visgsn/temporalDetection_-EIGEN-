@@ -15,15 +15,14 @@ import logging
 from PIL import Image
 from random import shuffle
 
-
 ##### CONFIGURATION ####################################################################################################
-### *** HOME ***
-kaistDataFolder = '/home/gueste/data/KAIST/data-kaist'
-### *** WORK ***
-#kaistDataFolder = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
+atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
-trainImgSub     = 'train-all-T'     # Desired training subset of kaistDataFolder (Contains .png IMAGES!)
-testImgSub      = 'test-all'        # Desired test subset of kaistDataFolder (Contains .png IMAGES!)
+dataKaistHOME   = '/home/gueste/data/KAIST/data-kaist'
+dataKaistWORK   = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
+
+trainImgSub     = 'train-all-T'     # Desired training subset of dataKaist (Contains .png IMAGES!)
+testImgSub      = 'test-all'        # Desired test subset of dataKaist (Contains .png IMAGES!)
 
 useThermal      = True              # If False, 'RGB_'-images will be extracted.
 shuffleFiles    = True              # Randomize order of train images
@@ -34,14 +33,18 @@ logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:
 ########################################################################################################################
 
 
-kaistRoot           = os.path.split(kaistDataFolder)[0]
+
+dataKaist = dataKaistWORK[:] if atWORK else dataKaistHOME
+assert os.path.exists(dataKaist), \
+    "Path {} does not exist! --> atWORK = ?".format(dataKaist)
+
+kaistRoot           = os.path.split(dataKaist)[0]
 outputFolder        = os.path.join(kaistRoot, trainImgSub)
 outputFolder_rel    = os.path.relpath(outputFolder, kaistRoot)
-trainFolder         = os.path.join(kaistDataFolder, trainImgSub, "images")
+trainFolder         = os.path.join(dataKaist, trainImgSub, "images")
 trainFolder_rel     = os.path.relpath(trainFolder, kaistRoot)
-testFolder          = os.path.join(kaistDataFolder, testImgSub, "images")
+testFolder          = os.path.join(dataKaist, testImgSub, "images")
 testFolder_rel      = os.path.relpath(testFolder, kaistRoot)
-
 
 # Create trainval.txt
 trainValFileName = os.path.join(outputFolder, "ImageSets/Main/trainval.txt")

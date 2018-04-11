@@ -16,14 +16,13 @@ import sys
 import re
 import logging
 
-##### Configurations ########################################
-### *** HOME ***
-annoDir     = "/home/gueste/data/KAIST/data-kaist/annotations-extracted"    # Input annotations
-imageDir    = "/home/gueste/data/KAIST/data-kaist/videos-extracted"         # Input images
-outputDir   = "/home/gueste/data/KAIST/data-kaist/train-all-T"              # Last element of path used as data postfix!
-### *** WORK ***
-# Insert config for WORK here...
+##### Configurations ###################################################################################################
+atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
+dataKaistHOME   = '/home/gueste/data/KAIST/data-kaist'
+dataKaistWORK   = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
+
+newSubsetName   = 'train-all-T'
 extractThermal  = True              # If true, thermal images will be extracted into outputDir
 extractRgb      = False             # If true, RGB images will be extracted into outputDir
 
@@ -32,12 +31,25 @@ imageRegex      = 'frame_.*.png$'   # Used to find available images
 extractSetRegex = '.*\/set0[0-5]\/' # Specifies which sets to extract (Default: '.*\/set0[0-5]\/')
 splitThermRegex = '.*\/LWIR_V'      # Used to separate RGB- and thermal images
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
-#############################################################
+########################################################################################################################
 
 
 
 
 ### MAIN
+if atWORK:
+    annoDir = os.path.join(dataKaistWORK, "annotations-extracted")  # Input annotations
+    imageDir = os.path.join(dataKaistWORK, "videos-extracted")      # Input images
+    outputDir = os.path.join(dataKaistWORK, newSubsetName)          # Last element of path used as data postfix!
+    dataKaist = dataKaistWORK[:]
+else:
+    annoDir = os.path.join(dataKaistHOME, "annotations-extracted")  # Input annotations
+    imageDir = os.path.join(dataKaistHOME, "videos-extracted")      # Input images
+    outputDir = os.path.join(dataKaistHOME, newSubsetName)          # Last element of path used as data postfix!
+    dataKaist = dataKaistHOME[:]
+assert os.path.exists(dataKaist), \
+    "Path {} does not exist! --> atWORK = ?".format(dataKaist)
+
 # Construct data paths and create output directory
 annoDir_out     = os.path.join(outputDir, "annotations")
 imageDir_out    = os.path.join(outputDir, "images")

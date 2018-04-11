@@ -17,18 +17,28 @@ width=0
 height=0
 extra_cmd="--encode-type=png --encoded"
 
-### *** HOME ***
-RefineDet_ROOT="$HOME/code/caffe/RefineDet"
-data_root_dir="$HOME/data/KAIST"
-### *** WORK ***
-#RefineDet_ROOT="$HOME/code/caffe/RefineDet"
-#data_root_dir="/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/"     # CHECK this!!!
+# Change "atWORK" to adapt working directories (0: HOME - 1: WORK)
+atWORK=1
+RefineDet_ROOT_HOME="$HOME/code/caffe/RefineDet"
+data_root_dir_HOME="$HOME/data/KAIST"
+RefineDet_ROOT_WORK="$HOME/code/caffe/RefineDet"
+data_root_dir_WORK="/net4/merkur/storage/deeplearning/users/gueste/data/KAIST"
 
 trainsetName="train-all-T"
 tmpDetRepo_ROOT="$HOME/code/temporalDetection_-EIGEN-"
 mapfile="$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
 ################################################################################
 
+
+
+if [ $atWORK ]
+then
+  RefineDet_ROOT=$RefineDet_ROOT_WORK
+  data_root_dir=$data_root_dir_WORK
+else
+  RefineDet_ROOT=$RefineDet_ROOT_HOME
+  data_root_dir=$data_root_dir_HOME
+fi
 
 cd $RefineDet_ROOT
 
