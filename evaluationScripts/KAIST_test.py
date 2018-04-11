@@ -18,18 +18,24 @@ import logging
 
 if __name__ == '__main__':
     ##### CONFIGURATION ################################################################################################
-    ### *** HOME ***
-    path_prefix = "{}/train_test_data".format(os.environ['HOME'])
-    ### *** WORK ***
-    #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+    # Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
+    atWork  = True
 
-    subsetName  = "train-all-T"
+    subsetName  = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name    = "refinedet_vgg16_320x320"
-    single_scale = True # True: single scale test;  False: multi scale test
-    GPU_ID = int(sys.argv[1])   # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    single_scale = True  # True: single scale test;  False: multi scale test
+    GPU_ID = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+
+    path_prefix_HOME = "{}/train_test_data".format(os.environ['HOME'])
+    path_prefix_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
     logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
     ####################################################################################################################
+
+
+    path_prefix = path_prefix_WORK if atWork else path_prefix_HOME
+    assert os.path.exists(path_prefix), \
+        "Path {} does not exist! --> atWORK = ?".format(path_prefix)
 
 
     kaist_path = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)

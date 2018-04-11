@@ -1,8 +1,10 @@
 '''
-In this example, we will load a RefineDet model and use it to detect objects.
+    In this example, we will load a RefineDet model and use it to detect objects.
 
-ATTENTION:
-    Please adapt paths in files "pascal_voc.py" and "coco.py" before starting this script!
+    USAGE: python KAIST_demo.py <GPU-ID for execution>
+
+    ATTENTION:
+        Please adapt paths in files "pascal_voc.py" before starting this script!
 '''
 
 import os
@@ -66,23 +68,36 @@ def ShowResults(img, image_file, results, labelmap, threshold=0.6, save_fig=Fals
 
 if __name__ == '__main__':
     ##### CONFIGURATION ################################################################################################
-    ### *** HOME ***
-    path_prefix     = "{}/train_test_data".format(os.environ['HOME'])
-    file_postfix    = "iter_10000"  # Select which trained state to use
-    ### *** WORK ***
-    #path_prefix = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
-    #file_postfix = "iter_120000"  # Select which trained state to use
 
-    subsetName  = "train-all-T"
-    job_name    = "refinedet_vgg16_320x320"
+    # ***ATTENTION***: caffe_root defined in import section at beginning of this file!!!
 
-    dataset_name = "KAIST"
-    labelmap_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)     # Hier eventuell Problem mit "(EIGEN)" <--> "-EIGEN-"
+    # Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
+    atWork  = True
+
+    file_postfix    = "iter_10000"  # Select which trained state to use for analysis
+    dataset_name    = "KAIST"
+    subsetName      = "train-all-T"
+    job_name        = "refinedet_vgg16_320x320"
+
+    det_threshold   = 0.5  # Detection threshold level to use
+
+    # Path to labelmap file
+    labelmap_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
+
+    # Input path prefix
+    path_prefix_HOME    = "{}/train_test_data".format(os.environ['HOME'])
+    path_prefix_WORK    = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
     ####################################################################################################################
+
+
+    path_prefix = path_prefix_WORK if atWork else path_prefix_HOME
+    assert os.path.exists(path_prefix), \
+        "Path {} does not exist! --> atWORK = ?".format(path_prefix)
+
 
     kaist_path      = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
     model_def       = os.path.join(kaist_path, 'deploy.prototxt')
-    model_weights   = os.path.join(kaist_path, '{}_{}_{}.caffemodel'.format(dataset_name, job_name, file_postfix) )
+    model_weights   = os.path.join(kaist_path, '{}_{}_{}.caffemodel'.format(dataset_name, job_name, file_postfix))
 
     # gpu preparation
     gpu_id = int(sys.argv[1])   #Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
@@ -131,4 +146,4 @@ if __name__ == '__main__':
 
         # show result
         #ShowResults(image, image_file, result, labelmap, 0.6, save_fig=False)  # ORIGINAL
-        ShowResults(image, image_file, result, labelmap, 0.3, save_fig=False)
+        ShowResults(image, image_file, result, labelmap, threshold=det_threshold, save_fig=False)
