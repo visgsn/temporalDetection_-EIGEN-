@@ -18,6 +18,44 @@ import shutil
 import stat
 import subprocess
 
+
+
+##### BASIC CONFIGURATION ##############################################################################################
+# Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
+atWORK  = True
+
+# Set true if you want to start training right after generating all files. (DEFAULT: True)
+run_soon = True
+# Set if you want to load from most recently saved snapshot. False: load from pretrain_model (DEFAULT: True)
+resume_training = False
+# If true, Remove old model files (old snapshot files). (DEFAULT: False)
+remove_old_models = True
+
+max_iter_train  = 50184  # Maximum number of solver iterations (100368 --> 2x all KAIST train images)
+snapshot_train  = 2500  # Number of iterations to take a snapshot
+base_lr_train   = 0.0004  # Learning rate to start with (ORIGINAL: 0.0005)
+
+# Batch size for training
+batch_size_HOME = 8
+batch_size_WORK = 30
+
+caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])  # The directory which contains the caffe code.
+
+job_name_template = "refinedet_vgg16_{}"  # Job name for output (Brackets will be filled with resize info!)
+subsetName        = "train-all-T"  # Subset name to train on (existing)
+dataset_name      = "KAIST"  # Define Dataset name to train on
+
+# Path to dataset root (e.g. "/home/gueste/data/KAIST")
+dataset_root_HOME = "{}/data/{}".format(os.environ['HOME'], dataset_name)
+dataset_root_WORK = "/net4/merkur/storage/deeplearning/users/gueste/data/{}".format(dataset_name)
+
+# Directory prefix for save_dir, snapshot_dir and job_dir
+prefix_saveSnapJob_HOME = "{}/train_test_data".format(os.environ['HOME'])
+prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
+########################################################################################################################
+
+
+
 # Add extra layers on top of a "base" network (e.g. VGGNet or ResNet).
 def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations=[], lr_mult=1):
     use_relu = True
@@ -84,25 +122,8 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 
 
 ############## Modify the following parameters accordingly ##############
-# The directory which contains the caffe code.
-caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
-# Define Dataset name to train on
-dataset_name    = "KAIST"
-subsetName      = "train-all-T"
-### *** HOME ***
-dataset_root = "{}/data/{}".format(os.environ['HOME'], dataset_name)
-### *** WORK ***
-#dataset_root = "/net4/merkur/storage/deeplearning/users/gueste/data/{}".format(dataset_name)                            # Check if correct!!!
+dataset_root = dataset_root_WORK if atWORK else dataset_root_HOME
 
-# Set true if you want to start training right after generating all files.
-run_soon = True                                                                # Change back to True!!!
-# Set true if you want to load from most recently saved snapshot.
-# Otherwise, we will load from the pretrain_model defined below.
-#resume_training = True                                                         # ORIGINAL
-resume_training = False
-# If true, Remove old model files.
-#remove_old_models = False                                                       # ORIGINAL
-remove_old_models = False
 
 # The database file for training data. Created by create_data.sh
 train_data = "{}/examples/{}/{}/{}_trainval_lmdb".format(caffe_root, dataset_name, subsetName, dataset_name)
@@ -259,23 +280,14 @@ else:
     base_lr = 0.00004
 
 # Modify the job name if you want.
-job_name = "refinedet_vgg16_{}".format(resize)                                                                          # Adapt to own net name!!!
+job_name = job_name_template.format(resize)
 # The name of the model. Modify it if you want.
 model_name = "{}_{}".format(dataset_name, job_name)
 
 
 
 ############## Directory prefix for save_dir, snapshot_dir and job_dir! ##############
-# *** HOME ***
-prefix_saveSnapJob = "{}/train_test_data".format(os.environ['HOME'])
-# *** WORK ***
-#prefix_saveSnapJob = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
-
-### Directory prefix for output_result_dir!                                                                             # NOT used?!?
-# *** HOME ***
-prefix_outputResultDir = "{}/data".format(os.environ['HOME'])
-# *** WORK ***
-#prefix_outputResultDir = "/net4/merkur/storage/deeplearning/users/gueste/data"
+prefix_saveSnapJob = prefix_saveSnapJob_WORK if atWORK else prefix_saveSnapJob_HOME
 
 
 
@@ -285,9 +297,6 @@ save_dir = "{}/models/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, 
 snapshot_dir = "{}/models/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, subsetName, job_name)
 # Directory which stores the job script and log file.
 job_dir = "{}/jobs/VGGNet/{}/{}/{}".format(prefix_saveSnapJob, dataset_name, subsetName, job_name)
-# Directory which stores the detection results.
-#output_result_dir = "{}/data/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(os.environ['HOME'], job_name)   # ORIGINAL
-#output_result_dir = "{}/RefineDet/pascal/VOCdevkit/results/VOC2007/{}/Main".format(prefix_outputResultDir, job_name)    # NOT used?!?
 
 # model definition files.
 train_net_file = "{}/train.prototxt".format(save_dir)
@@ -300,13 +309,10 @@ snapshot_prefix = "{}/{}".format(snapshot_dir, model_name)
 job_file = "{}/{}.sh".format(job_dir, model_name)
 
 # Stores the test image names and sizes. Created by create_list.sh
-#name_size_file = "data/VOC0712/test_name_size.txt"                              # ORIGINAL
 name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, subsetName)
 # Stores LabelMapItem.
-#label_map_file = "data/VOC0712/labelmap_voc.prototxt"                           # ORIGINAL
 label_map_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
-# The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
-#pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"     # ORIGINAL
+# The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet. (Used if resume_training = False)
 pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
 
 # MultiBoxLoss parameters.
@@ -368,16 +374,15 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-#gpus = "0"                                  # ORIGINAL
-gpus = str(sys.argv[1])                     #Adapted to use with script "StartIfGPUFree.py"
+gpus = str(sys.argv[1])                                                 #Adapted to use with script "StartIfGPUFree.py"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 
 # Divide the mini-batch to different GPUs.
-#batch_size = 32                             # ORIGINAL
-batch_size = 8                             # Work: 26, Home: 8
-#accum_batch_size = 32                       # ORIGINAL
-accum_batch_size = 8                       # Work: 26, Home: 8
+#batch_size = 32                                                        # ORIGINAL
+batch_size = batch_size_WORK if atWORK else batch_size_HOME             # Work: 26, Home: 8
+#accum_batch_size = 32                                                  # ORIGINAL
+accum_batch_size = batch_size_WORK if atWORK else batch_size_HOME       # Work: 26, Home: 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
@@ -404,20 +409,21 @@ test_iter = num_test_image / test_batch_size    # NOT used!
 
 solver_param = {
     # Train parameters
-    'base_lr': base_lr,
+    #'base_lr': base_lr,                        # ORIGINAL
+    'base_lr': base_lr_train,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [50000, 70000, 90000],
+    'stepvalue': [30000, 40000, 45000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
-    #'max_iter': 120000,                # ORIGINAL
-    'max_iter': 10000,                 # 100368 --> 2x all KAIST train images
-    #'snapshot': 5000,                  # ORIGINAL
-    'snapshot': 500,
+    #'max_iter': 120000,                        # ORIGINAL
+    'max_iter': max_iter_train,                 # 100368 --> 2x all KAIST train images
+    #'snapshot': 5000,                          # ORIGINAL
+    'snapshot': snapshot_train,
     'display': 10,
     'average_loss': 10,
-    'type': "SGD",                      # ORIGINAL
+    'type': "SGD",                              # ORIGINAL
     #'type': "Adam",
     'solver_mode': solver_mode,
     'device_id': device_id,
