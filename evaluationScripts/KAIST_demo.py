@@ -107,12 +107,13 @@ if __name__ == '__main__':
     net.blobs['data'].reshape(1, 3, img_resize, img_resize)
     transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
     transformer.set_transpose('data', (2, 0, 1))
-    transformer.set_mean('data', np.array([104, 117, 123]))  # mean pixel
+    transformer.set_mean('data', np.array([104, 117, 123]))  # mean pixel                                               # Adapt!
     transformer.set_raw_scale('data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
     transformer.set_channel_swap('data', (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
 
     # im_names = os.listdir('examples/images')
-    im_names = ['000456.jpg', '000542.jpg', '001150.jpg', '001763.jpg', '004545.jpg']
+    im_names = ['000456.jpg', '000542.jpg', '001150.jpg', '001763.jpg', '004545.jpg', \
+                'RGB_1.png', 'RGB_2.png', 'RGB_3.png', 'T_1.png', 'T_2.png', 'T_3.png']                                 # Takes .png images?
     for im_name in im_names:
         image_file = 'examples/images/' + im_name
         image = caffe.io.load_image(image_file)
@@ -130,4 +131,4 @@ if __name__ == '__main__':
 
         # show result
         #ShowResults(image, image_file, result, labelmap, 0.6, save_fig=False)  # ORIGINAL
-        ShowResults(image, image_file, result, labelmap, 0.2, save_fig=False)
+        ShowResults(image, image_file, result, labelmap, 0.3, save_fig=False)
