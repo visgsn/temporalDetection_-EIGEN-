@@ -123,6 +123,8 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 
 ############## Modify the following parameters accordingly ##############
 dataset_root = dataset_root_WORK if atWORK else dataset_root_HOME
+assert os.path.exists(dataset_root), \
+    "Path {} does not exist! --> atWORK = ?".format(dataset_root)
 
 
 # The database file for training data. Created by create_data.sh
