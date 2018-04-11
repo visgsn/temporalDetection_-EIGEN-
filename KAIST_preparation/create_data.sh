@@ -19,14 +19,13 @@ extra_cmd="--encode-type=png --encoded"
 
 ### *** HOME ***
 RefineDet_ROOT="$HOME/code/caffe/RefineDet"
-tmpDetRepo_ROOT="$HOME/code/temporalDetection_(EIGEN)"
 data_root_dir="$HOME/data/KAIST"
 ### *** WORK ***
 #RefineDet_ROOT="$HOME/code/caffe/RefineDet"
-#tmpDetRepo_ROOT="$HOME/code/temporalDetection_(EIGEN)"
 #data_root_dir="/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/"     # CHECK this!!!
 
 trainsetName="train-all-T"
+tmpDetRepo_ROOT="$HOME/code/temporalDetection_-EIGEN-"
 mapfile="$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
 ################################################################################
 

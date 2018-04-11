@@ -304,7 +304,7 @@ job_file = "{}/{}.sh".format(job_dir, model_name)
 name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, subsetName)
 # Stores LabelMapItem.
 #label_map_file = "data/VOC0712/labelmap_voc.prototxt"                           # ORIGINAL
-label_map_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
+label_map_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
 #pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"     # ORIGINAL
 pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)

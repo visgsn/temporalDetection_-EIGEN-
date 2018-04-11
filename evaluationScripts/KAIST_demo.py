@@ -1,8 +1,10 @@
 '''
-In this example, we will load a RefineDet model and use it to detect objects.
+    In this example, we will load a RefineDet model and use it to detect objects.
 
-ATTENTION:
-    Please adapt paths in files "pascal_voc.py" and "coco.py" before starting this script!
+    USAGE: python KAIST_demo.py <GPU-ID for execution>
+
+    ATTENTION:
+        Please adapt paths in files "pascal_voc.py" before starting this script!
 '''
 
 import os
@@ -77,7 +79,7 @@ if __name__ == '__main__':
     job_name    = "refinedet_vgg16_320x320"
 
     dataset_name = "KAIST"
-    labelmap_file = "{}/code/temporalDetection_(EIGEN)/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)     # Hier eventuell Problem mit "(EIGEN)" <--> "-EIGEN-"
+    labelmap_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
     ####################################################################################################################
 
     kaist_path      = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
