@@ -19,7 +19,7 @@ import logging
 if __name__ == '__main__':
     ##### CONFIGURATION ################################################################################################
     # Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
-    atWork  = True
+    atWork  = True  # Change this in "factory.py", too!
 
     subsetName  = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name    = "refinedet_vgg16_320x320"
