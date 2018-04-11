@@ -20,13 +20,20 @@ import os
 
 
 ##### CONFIGURATION ####################################################################################################
-kaist_subsets = ['train-all-T'] # List of all (converted) KAIST-subsets
+# Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
+atWork  = True
 
-### *** HOME ***
-kaist_path = '{}/data/KAIST'.format(os.environ['HOME'])
-### *** WORK ***
-#kaist_path = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST'
+# List of all (converted) KAIST-subsets - Append to list if new ones are available!
+kaist_subsets   = ['train-all-T']
+
+kaist_path_HOME = '{}/data/KAIST'.format(os.environ['HOME'])
+kaist_path_WORK = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST'
 ########################################################################################################################
+
+
+kaist_path = kaist_path_WORK if atWork else kaist_path_HOME
+assert os.path.exists(kaist_path), \
+    "Path {} does not exist! --> atWORK = ?".format(kaist_path)
 
 
 # Set up KAIST_<subset_name>_<split> using selective search "fast" mode

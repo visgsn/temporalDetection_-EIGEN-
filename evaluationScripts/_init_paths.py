@@ -19,6 +19,9 @@ caffe_root  = "{}/code/caffe/RefineDet".format(os.environ['HOME'])
 this_dir = os.path.dirname(__file__)    # Is also the output directory for test results!
 ########################################################################################################################
 
+assert os.path.exists(caffe_root), \
+    "Path to caffe_root ({}) does not exist! --> Edit this file, if necessary.".format(caffe_root)
+
 # Add caffe to PYTHONPATH
 caffe_path = os.path.join(caffe_root, 'python')
 add_path(caffe_path)
