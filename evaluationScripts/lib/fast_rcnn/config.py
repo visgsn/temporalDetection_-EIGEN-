@@ -216,8 +216,14 @@ __C.USE_GPU_NMS = True
 # Default GPU device id
 __C.GPU_ID = 0
 
-# Default GPU device id
+# Default mAP
 __C.mAP = 0.0
+
+# Default Precision
+__C.prec = 0.0
+
+# Default Recall
+__C.rec = 0.0
 
 # net_name
 __C.net_name = ""

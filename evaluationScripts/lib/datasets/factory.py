@@ -25,6 +25,8 @@ atWork  = True
 
 # List of all (converted) KAIST-subsets - Append to list if new ones are available!
 kaist_subsets   = ['train-all-T']
+kaist_classes   = ('__background__',  # always index 0
+                   'person')
 
 kaist_path_HOME = '{}/data/KAIST'.format(os.environ['HOME'])
 kaist_path_WORK = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST'
@@ -41,7 +43,7 @@ for subset_name in kaist_subsets:
     for split in ['trainval', 'test']:
         name = 'kaist_{}_{}'.format(subset_name, split)
         __sets[name] = (lambda split=split, subset_name=subset_name, kaist_path=kaist_path: \
-                            kaist(split, subset_name, kaist_path=kaist_path))
+                            kaist(split, subset_name, kaist_path=kaist_path, kaist_classes=kaist_classes))
 
 
 # Set up voc_<year>_<split> using selective search "fast" mode

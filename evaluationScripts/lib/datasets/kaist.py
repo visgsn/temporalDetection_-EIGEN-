@@ -21,7 +21,7 @@ from kaist_eval import kaist_eval
 from fast_rcnn.config import cfg
 
 class kaist(imdb):
-    def __init__(self, image_set, name, kaist_path=None):
+    def __init__(self, image_set, name, kaist_path=None, kaist_classes=None):
         imdb.__init__(self, 'kaist_' + name + '_' + image_set)
         self._name = name
         self._image_set = image_set
@@ -40,8 +40,9 @@ class kaist(imdb):
         #self._ImageData_path    = os.path.join(self._kaist_path, 'data-kaist', 'test-all')
         self._ImageData_path    = None
         self._Annotations_path  = None
-        self._classes = ('__background__', # always index 0
-                         'person')
+        #self._classes = ('__background__', # always index 0
+        #                 'person')
+        self._classes = kaist_classes if not kaist_classes == None else ('__background__', 'person')                    # Usually given from 'factory.py'
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.png'
         self._use_07_metric = False     # Shoult be 'False' in order to ensure correct calculation of Average Precision
@@ -300,7 +301,9 @@ class kaist(imdb):
             'Main',
             self._image_set + '.txt')
         cachedir = os.path.join(self._kaist_path, 'annotations_cache')
-        aps = []
+        aps     = []
+        precs   = []
+        recs    = []
         # The PASCAL VOC metric changed in 2010
         #use_07_metric = True if int(self._name) < 2010 else False
         print 'VOC07 metric? ' + ('Yes' if self._use_07_metric else 'No')
@@ -313,18 +316,24 @@ class kaist(imdb):
             rec, prec, ap = kaist_eval(
                 filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
                 use_07_metric=self._use_07_metric)
-            aps += [ap]
-            print('AP for {} = {:.4f}'.format(cls, ap))
+            aps     += [ap]
+            precs   += [np.mean(prec)]
+            recs    += [np.mean(rec)]
+            print('AP, Precision, Recall for {} = {:.4f},  {:.4f},  {:.4f}'
+                  .format(cls, ap, np.mean(prec), np.mean(rec)))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
                 cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
-        print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        print('Mean (AP, Precision, Recall) = ({:.4f}, {:.4f}, {:.4f})'
+              .format(np.mean(aps), np.mean(precs), np.mean(recs)))
         print('~~~~~~~~')
-        print('Results:')
-        for ap in aps:
-            print('{:.3f}'.format(ap))
-        print('{:.3f}'.format(np.mean(aps)))
+        print('Results (mAP, Precision, Recall):')
+        for i, ap in enumerate(aps):
+            print('{:.3f},  {:.3f},  {:.3f}'.format(ap, precs[i], recs[i]))
+        print('\nMean: {:.3f},  {:.3f},  {:.3f}'.format(np.mean(aps), np.mean(precs), np.mean(recs)))
         print('~~~~~~~~')
         cfg.mAP = np.mean(aps)
+        cfg.prec = np.mean(precs)
+        cfg.rec = np.mean(recs)
 
     def _do_matlab_eval(self, output_dir='output'):                                                                     # CHECKED! (Not needed?!?)
         print '-----------------------------------------------------'
