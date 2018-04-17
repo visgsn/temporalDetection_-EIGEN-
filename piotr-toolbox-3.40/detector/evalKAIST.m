@@ -15,19 +15,21 @@
 %   - channels/TMagTOri.m (added)
 
 %% extract training and testing images and ground truth
-cd(fileparts(which('acfDemoKAIST.m'))); dataDir='../../data-kaist/';
+cd(fileparts(which('evalKAIST.m')));
+dataDir='../../data-kaist/';                                                % Adapt this! (Give parameter?!?)
 addpath( genpath( '..' ) );
 
 cond = { '-all', '-day', '-night' };
-for c=1:3,
+for c=1:3,                                                                  % COMMENT OUT (WHOLE loop)!!!
     type=['test' cond{c}]; skip=[];
     dbInfo2(['kaist-' type]);
     if(exist([dataDir type '/annotations'],'dir')), continue; end
     dbExtract2(dataDir, type,1,skip);
 end
+% Not used with caffe detector:
 type='train-all'; skip=20; 
-dbInfo2( ['kaist-' type] ); type=[ type int2str2(skip,2)];
-if(~exist([dataDir type '/annotations'],'dir')),  dbExtract2(dataDir, type,1,skip); end
+dbInfo2( ['kaist-' type] ); type=[ type int2str2(skip,2)];                  % COMMENT OUT (Return values needed?)???
+if(~exist([dataDir type '/annotations'],'dir')),  dbExtract2(dataDir, type,1,skip); end     % COMMENT OUT!!!
 
 %% set up opts for training detector (see acfTrain)
 opts=acfTrain2(); opts.modelDs=[50 20.5]; opts.modelDsPad=[64 32];
@@ -70,21 +72,22 @@ pCustom(3).pFunc = {};
 opts.pPyramid.pChns.pCustom = pCustom;
 
 %% train detector (see acfTrain)
-detector = acfTrain2( opts );
+detector = acfTrain2( opts );                                               % COMMENT OUT!!!
 
 %% modify detector (see acfModify)
-pModify=struct('cascThr',-1,'cascCal',.025);
-detector=acfModify(detector,pModify);
+pModify=struct('cascThr',-1,'cascCal',.025);                                % Doesn't matter if reapply == 0!!!
+detector=acfModify(detector,pModify);                                       % COMMENT OUT!!!
 
 %% run detector on a sample image (see acfDetect)
 cond = '-all';     
 % cond = '-day';
 % cond = '-night';
 
-imgDir = [dataDir 'test' cond '/images'];       gtDir = [dataDir 'test' cond '/annotations']; 
+imgDir = [dataDir 'test' cond '/images'];
+gtDir = [dataDir 'test' cond '/annotations'];
 
-imgNms=bbGt('getFiles', {imgDir});
-I=imread(imgNms{102}); tic, bbs=acfDetect(I,detector); toc
+imgNms=bbGt('getFiles', {imgDir});                                          % Use f0 and f1 to select RGB-/IR-Images? (Or presort...)
+I=imread(imgNms{102}); tic, bbs=acfDetect(I,detector); toc                  % Give bbs with python! --> remove acfDetect(...)
 figure(3); imshow(I(:,:,1:3)); bbApply('draw',bbs); pause(.1);
 
 %% test detector and plot roc (see acfTest)
