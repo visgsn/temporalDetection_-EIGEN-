@@ -5,6 +5,7 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
+import matlab.engine
 import os
 from datasets._usefulFunctions import fileParts
 from datasets.imdb import imdb
@@ -56,7 +57,7 @@ class kaist(imdb):
         self.config = {'cleanup'     : True,
                        'use_salt'    : True,
                        'use_diff'    : False,
-                       'matlab_eval' : False,
+                       'matlab_eval' : True,
                        'rpn_file'    : None,
                        'min_size'    : 2}
 
@@ -271,6 +272,14 @@ class kaist(imdb):
                 filename)
         return path
 
+    def _get_kaist_results_file_template(self, output_dir):                                                             # SELF WRITTEN!
+        # Example path:
+        # ~/code/temporalDetection_-EIGEN-/evaluationScripts/output/default/train-all-T/...
+        # KAIST_refinedet_it50184_320x320_iter_2500/detections_for_matlab/<comp_id>_det_test_person.txt
+        filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
+        path = os.path.join(output_dir, "detections_for_matlab", filename)
+        return path
+
     def _write_voc_results_file(self, all_boxes):                                                                       # CHECKED!
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
@@ -290,6 +299,29 @@ class kaist(imdb):
                                 format(index, dets[k, -1],
                                        dets[k, 0] + 1, dets[k, 1] + 1,
                                        dets[k, 2] + 1, dets[k, 3] + 1))
+
+    def _write_kaist_results_file(self, all_boxes, output_dir):                                                         # SELF WRITTEN!
+        for cls_ind, cls in enumerate(self.classes):
+            if cls == '__background__':
+                continue
+            print 'Writing {} KAIST results file'.format(cls)
+            filename = self._get_kaist_results_file_template(output_dir).format(cls)
+            if not os.path.exists(os.path.dirname(filename)):
+                os.makedirs(os.path.dirname(filename))
+            with open(filename, 'wt') as f:
+                for im_ind, index in enumerate(self.image_index):
+                    dets = all_boxes[cls_ind][im_ind]
+                    if dets == []:
+                        continue
+                    # the VOCdevkit expects 1-based indices
+                    for k in xrange(dets.shape[0]):
+                        f.write('{:d} {:f} {:f} {:f} {:f} {:f}\n'.
+                                format(im_ind + 1,                          # index
+                                       (dets[k, 0] + 1),                    # left
+                                       (dets[k, 1] + 1),                    # top
+                                       (dets[k, 2] + 1) - (dets[k, 0] + 1), # width
+                                       (dets[k, 3] + 1) - (dets[k, 1] + 1), # height
+                                       dets[k, -1] * 100))                  # score
 
     def _do_python_eval(self, output_dir = 'output'):                                                                   # CHECKED!
         annopath = os.path.join(
@@ -335,23 +367,30 @@ class kaist(imdb):
         cfg.prec = np.mean(precs)
         cfg.rec = np.mean(recs)
 
-    def _do_matlab_eval(self, output_dir='output'):                                                                     # CHECKED! (Not needed?!?)
+    def _do_matlab_eval(self, output_dir='output'):                                                                     # SELF WRITTEN!!!
         print '-----------------------------------------------------'
         print 'Computing results with the official MATLAB eval code.'
         print '-----------------------------------------------------'
-        path = os.path.join(cfg.ROOT_DIR, 'lib', 'datasets',
-                            'VOCdevkit-matlab-wrapper')                                               # Adapt if needed!
-        cmd = 'cd {} && '.format(path)
-        cmd += '{:s} -nodisplay -nodesktop '.format(cfg.MATLAB)
-        cmd += '-r "dbstop if error; '
-        cmd += 'kaist_eval(\'{:s}\',\'{:s}\',\'{:s}\',\'{:s}\'); quit;"' \
-               .format(self._kaist_path, self._get_comp_id(),
-                       self._image_set, output_dir)
-        print('Running:\n{}'.format(cmd))
-        status = subprocess.call(cmd, shell=True)
+        # Start MATLAB engineand add toolbox path
+        mateng = matlab.engine.start_matlab()
+        mateng.addpath(mateng.genpath('~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/'))
+
+        # Reconsruct detection file name for class 'person', dir to store the results and the KAIST data dir
+        detectionFile = self._get_kaist_results_file_template(output_dir).format('person')
+        result_dir = os.path.split(detectionFile)[0] + '/'
+        data_dir = os.path.join(self._kaist_path, 'data-kaist/')
+        print("Using the following paths for MATLAB evaluation:")
+        print("Matlab detectionFile: " + str(detectionFile))
+        print("Matlab resultDir    : " + str(result_dir))
+        print("Matlab dataDir      : " + str(data_dir))
+
+        # Call MATLAB evaluation script
+        mateng.evalKAIST(result_dir, data_dir, detectionFile)
+        print("done")
 
     def evaluate_detections(self, all_boxes, output_dir):                                                               # CHECKED!
         self._write_voc_results_file(all_boxes)
+        self._write_kaist_results_file(all_boxes, output_dir)
         self._do_python_eval(output_dir)
         if self.config['matlab_eval']:
             self._do_matlab_eval(output_dir)
