@@ -9,6 +9,7 @@ function [miss,roc,gt,dt] = kaistTest( varargin )
 %   .name     - ['REQ'] detector name
 %   .imgDir   - ['REQ'] dir containing test images
 %   .gtDir    - ['REQ'] dir containing test ground truth
+%   .bbsNm    - ['REQ'] file containing detections (.txt format)
 %   .pLoad    - [] params for bbGt>bbLoad for test data (see bbGt>bbLoad)
 %   .pModify  - [] params for acfModify for modifying detector
 %   .thr      - [.5] threshold on overlap area for comparing two bbs
@@ -33,14 +34,14 @@ function [miss,roc,gt,dt] = kaistTest( varargin )
 % Licensed under the Simplified BSD License [see external/bsd.txt]
 
 % get parameters
-dfs={ 'name','REQ', 'imgDir','REQ', 'gtDir','REQ', 'pLoad',[], ...
+dfs={ 'name','REQ', 'imgDir','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
   'pModify',[], 'thr',.5,'mul',0, 'reapply',0, 'ref',10.^(-2:.25:0), ...
   'lims',[3.1e-3 1e1 .05 1], 'show',1, 'type', '', 'clr', 'g', 'lineSt', '-' };
-[name,imgDir,gtDir,pLoad,pModify,thr,mul,reapply,ref,lims,show,type,clr,lineSt] = ...
+[name,imgDir,gtDir,bbsNm,pLoad,pModify,thr,mul,reapply,ref,lims,show,type,clr,lineSt] = ...
   getPrmDflt(varargin,dfs,1);
 
 % run detector on directory of images
-bbsNm=[name type 'Detections.txt'];                                         % TODO: Export detections to .txt-file!
+%bbsNm=[name type 'Detections.txt'];                                         % TODO: Export detections to .txt-file!
 % if(reapply && exist(bbsNm,'file')), delete(bbsNm); end
 % if(reapply || ~exist(bbsNm,'file'))
 %   detector = load([name 'Detector.mat']);

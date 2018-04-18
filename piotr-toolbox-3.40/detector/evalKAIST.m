@@ -1,4 +1,4 @@
-function [miss,roc,gt,dt] = evalKAIST(outDir, dataDir, images, bbsNmFile)
+function [miss,roc,gt,dt] = evalKAIST(outDir, dataDir, bbsNmFile)
 % Demo for aggregate channel features object detector on KAIST dataset.
 %
 % See also acfReadme.m
@@ -18,7 +18,6 @@ function [miss,roc,gt,dt] = evalKAIST(outDir, dataDir, images, bbsNmFile)
 % INPUTS
 %  outDir    - Directory to save test results (With trailing "/"!)
 %  dataDir   - Directory containing KAIST data (DEFAULT: $KAIST_root/data-kaist/)
-%  images    - Images to use for testing (full path) (matching annotations!)
 %  bbsNmFile - Detections (must be of form [x y w h wt bbType] as .txt file)
 %
 % OUTPUTS
@@ -59,10 +58,11 @@ opts.posImgDir=[dataDir 'train-all' int2str2(skip,2) '/images'];
 %opts.name=[ 'models/AcfKAIST-RGB-T' ];
 %opts.name=[ 'models/AcfKAIST-RGB-T-TM-TO' ];
 %opts.name=[ 'models/AcfKAIST-RGB-T-THOG' ];
-opts.name=[ outDir 'TestResultsMATLAB/results' ];             % Output path
+opts.name=[ outDir 'results' ];                               % Output path
 
 % Detection labels to use or ignore
-pLoad={'format',1,'lbls',{'person'},'ilbls',{'people','person?','cyclist'}};    % Adapt format=1 (PascalVoc)?!?
+pLoad={'lbls',{'person'},'ilbls',{'people','person?','cyclist'}};           % Adapt format=1 (PascalVoc)?!?
+%pLoad={'format',1,'lbls',{'person'},'ilbls',{'people','person?','cyclist'}};% -->Modified version
 opts.pLoad = [pLoad 'hRng',[55 inf], 'vType', {'none'} ];
 
 %% To handle thermal channel
@@ -108,8 +108,9 @@ I=imread(imgNms{102});
 %figure(3); imshow(I(:,:,1:3)); bbApply('draw',bbs); pause(.1);
 
 %% test detector and plot roc (see acfTest)
-[miss,roc,gt,dt]= kaistTest('name',opts.name,'imgDir',imgDir,...
-  'gtDir',gtDir,'pLoad',[pLoad, 'hRng',[55 inf],...
+[miss,roc,gt,dt]= kaistTest(...
+  'name',opts.name,'imgDir',imgDir,...
+  'gtDir',gtDir,'bbsNm',bbsNmFile,'pLoad',[pLoad, 'hRng',[55 inf],...
   'vType',{{'none','partial'}},'xRng',[5 635],'yRng',[5 475]],...
   'pModify',pModify,'reapply',0,'show',11,...
   'lims', [3.1e-3 3.1e1 .2 1],'type', cond, 'clr', 'r', 'lineSt', '-');
