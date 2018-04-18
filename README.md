@@ -18,5 +18,9 @@ In order to get the Code Working, install prerequisits and follow the instructio
 
 - In order to use the MATLAB evaluation scripts with Piotrs toolbox (already included in this repo!)
   sinply open MATLAB and execute:
-  "addpath(genpath('~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/')); savepath;"
-  to add the toolbox to the MATLAB search path.
+  1. "addpath(genpath('~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/')); savepath;"
+  OR
+  2. "addpath(genpath('~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/')); savepath '~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/pathdef.m';"
+  if matlab throws a warning while saving the new MATLAB path in the default directory.
+  (In case of the second option (2.), you have to start MATLAB from the piotr-toolbox folder every time in order to use the new file correctly.)
+  This adds the toolbox to the MATLAB search path.
