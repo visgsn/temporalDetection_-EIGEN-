@@ -24,3 +24,6 @@ In order to get the Code Working, install prerequisits and follow the instructio
   if matlab throws a warning while saving the new MATLAB path in the default directory.
   (In case of the second option (2.), you have to start MATLAB from the piotr-toolbox folder every time in order to use the new file correctly.)
   This adds the toolbox to the MATLAB search path.
+  
+  Aditionally install the "MATLAB Engine", since it's needed by the evaluation scripts. Just follow the instructions on the link below:
+  https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
