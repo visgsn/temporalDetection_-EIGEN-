@@ -40,17 +40,6 @@ dfs={ 'name','REQ', 'imgDir','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ..
 [name,imgDir,gtDir,bbsNm,pLoad,pModify,thr,mul,reapply,ref,lims,show,type,clr,lineSt] = ...
   getPrmDflt(varargin,dfs,1);
 
-% run detector on directory of images
-%bbsNm=[name type 'Detections.txt'];                                         % TODO: Export detections to .txt-file!
-% if(reapply && exist(bbsNm,'file')), delete(bbsNm); end
-% if(reapply || ~exist(bbsNm,'file'))
-%   detector = load([name 'Detector.mat']);
-%   detector = detector.detector;
-%   if(~isempty(pModify)), detector=acfModify(detector,pModify); end
-%   imgNms = bbGt('getFiles',{imgDir});
-%   acfDetect( imgNms, detector, bbsNm );
-% end
-
 % run evaluation using bbGt
 [gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);
 [gt,dt] = bbGt('evalRes',gt,dt,thr,mul);
