@@ -21,10 +21,12 @@ if __name__ == '__main__':
     # Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
     atWork  = True  # Change this in "factory.py", too!
 
-    subsetName  = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
-    job_name    = "refinedet_vgg16_320x320"
-    single_scale = True  # True: single scale test;  False: multi scale test
-    GPU_ID = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    MatlabEval  = True  # If True: Use additional MATLAB test evaluation
+
+    subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
+    job_name        = "refinedet_vgg16_320x320"  # DEFAULT: "refinedet_vgg16_320x320"
+    single_scale    = True  # True: single scale test;  False: multi scale test
+    GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     path_prefix_HOME = "{}/train_test_data".format(os.environ['HOME'])
     path_prefix_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
@@ -51,8 +53,9 @@ if __name__ == '__main__':
     caffe.set_mode_gpu()
     caffe.set_device(GPU_ID)
 
-    imdb = get_imdb(test_set)
+    imdb = get_imdb(test_set)  # In this case, imdb is an instance of class "kaist"!
     imdb.competition_mode(False)
+    imdb.set_matlab_eval(evalWithMatlab=MatlabEval)
 
     #prototxt = kaist_path + 'deploy.prototxt'
     prototxt = os.path.join(kaist_path, 'deploy.prototxt')

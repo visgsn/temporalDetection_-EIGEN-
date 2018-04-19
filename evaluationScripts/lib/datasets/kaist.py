@@ -57,7 +57,7 @@ class kaist(imdb):
         self.config = {'cleanup'     : True,
                        'use_salt'    : True,
                        'use_diff'    : False,
-                       'matlab_eval' : True,
+                       'matlab_eval' : False,
                        'rpn_file'    : None,
                        'min_size'    : 2}
 
@@ -400,6 +400,9 @@ class kaist(imdb):
                     continue
                 filename = self._get_voc_results_file_template().format(cls)
                 os.remove(filename)
+
+    def set_matlab_eval(self, evalWithMatlab=True):                                                                     # SELF WRITTEN!
+        self.config['matlab_eval'] = True if evalWithMatlab else False
 
     def competition_mode(self, on):                                                                                     # CHECKED!
         if on:
