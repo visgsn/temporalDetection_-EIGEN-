@@ -369,7 +369,7 @@ class kaist(imdb):
         print('Mean (AP, Precision, Recall) = ({:.4f}, {:.4f}, {:.4f})'
               .format(np.mean(aps), np.mean(precs), np.mean(recs)))
         print('~~~~~~~~')
-        print('Results (mAP, Precision, Recall):')
+        print('Results (mAP, mPrecision, mRecall):')  # Mean Values!
         for i, ap in enumerate(aps):
             print('{:.3f},  {:.3f},  {:.3f}'.format(ap, precs[i], recs[i]))
         print('\nMean: {:.3f},  {:.3f},  {:.3f}'.format(np.mean(aps), np.mean(precs), np.mean(recs)))
@@ -396,7 +396,8 @@ class kaist(imdb):
         print("Matlab dataDir      : " + str(data_dir))
 
         # Call MATLAB evaluation script
-        mateng.evalKAIST(result_dir, data_dir, detectionFile)
+        [cfg.miss, cfg.roc, cfg.gt, cfg.dt] = mateng.evalKAIST(result_dir, data_dir, detectionFile ,nargout=4)
+
         print("done")
 
     def evaluate_detections(self, all_boxes, output_dir):                                                               # CHECKED!

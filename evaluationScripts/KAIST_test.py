@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # Set configuration options
     cfg.single_scale_test = single_scale
-    cfg.ROOT_DIR    = train_test_outPath  # Defines output directory for evaluation results
+    cfg.ROOT_DIR = train_test_outPath  # Defines output directory for evaluation results
 
     if '320' in train_test_outPath:
         input_size = 320
@@ -64,6 +64,12 @@ if __name__ == '__main__':
     models = os.listdir(train_test_outPath)
 
     mAP = {}    # mean Average Precision
+    mPrec = {}  # mean Precision
+    mRec = {}   # mean Recall
+    miss = {}   # Misses from Matlab
+    roc = {}    # Receiver Operating Characteristics from MATLAB (=[score fp tp])
+    gt = {}     # Ground Truths from MATLAB
+    dt = {}     # Detections from MATLAB
     for model in models:
         if model.find('caffemodel') == -1:
             continue
@@ -82,7 +88,20 @@ if __name__ == '__main__':
                 multi_scale_test_net_320(net, imdb)
             else:
                 multi_scale_test_net_512(net, imdb)
-        mAP[iter] = cfg.mAP
+        mAP[iter]   = cfg.mAP
+        mPrec[iter] = cfg.prec
+        mRec[iter]  = cfg.rec
+        # Also available for further evaluation (From MATLAB, not used yet):
+        #miss[iter]  = cfg.miss
+        #roc[iter]   = cfg.roc
+        #gt[iter]    = cfg.gt
+        #dt[iter]    = cfg.dt
+
+    # Just to check data structure:
+    #print("Miss  : " + str( miss.get(miss.keys()[0]) ))
+    #print("ROCs  : " + str( roc.get(roc.keys()[0]) ))
+    #print("GTs   : " + str( gt.get(gt.keys()[0]) ))
+    #print("DTs   : " + str( dt.get(dt.keys()[0]) ))
 
     keys = mAP.keys()
     keys.sort()
@@ -90,10 +109,14 @@ if __name__ == '__main__':
     print("########################################################################")
     print("########################################################################")
     for key in keys:
-        value = mAP.get(key)
-        print("%d\t%.4f"%(key, value))
-        templine.append("%d\t%.4f\n"%(key, value))
+        value_mAP   = mAP.get(key)
+        value_mPrec = mPrec.get(key)
+        value_mRec  = mRec.get(key)
+        print("%d\t%.4f\t%.4f\t%.4f" % (key, value_mAP, value_mPrec, value_mRec))
+        templine.append("%d\t%.4f\t%.4f\t%.4f\n" % (key, value_mAP, value_mPrec, value_mRec))
     with open(train_test_outPath + 'mAP.txt', 'w+') as f:
+        print("\n")
+        logging.info("Results can be found under: " + str(train_test_outPath))
         f.writelines(templine)
     print("########################################################################")
     print("########################################################################")

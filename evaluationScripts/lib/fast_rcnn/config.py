@@ -225,6 +225,18 @@ __C.prec = 0.0
 # Default Recall
 __C.rec = 0.0
 
+# Default Miss Rate
+__C.miss = None
+
+# Default ROCs
+__C.roc = None
+
+# Default Ground Truths
+__C.gt = None
+
+# Default Detections
+__C.dt = None
+
 # net_name
 __C.net_name = ""
 
