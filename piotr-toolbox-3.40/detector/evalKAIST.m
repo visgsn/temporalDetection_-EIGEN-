@@ -31,6 +31,7 @@ function [miss,roc,gt,dt] = evalKAIST(outDir, dataDir, bbsNmFile)
 cd(fileparts(which('evalKAIST.m')));
 addpath( genpath( '..' ) );
 skip=20;
+[~,bbsNmName,~] = fileparts(bbsNmFile);
 
 %% set up opts for training detector (see acfTrain) (ONLY DUMMY VARIABLES!)
 opts=acfTrain2(); opts.modelDs=[50 20.5]; opts.modelDsPad=[64 32];
@@ -43,15 +44,13 @@ opts.pJitter=struct('flip',1);
 opts.posGtDir=[dataDir 'train-all' int2str2(skip,2) '/annotations'];
 opts.posImgDir=[dataDir 'train-all' int2str2(skip,2) '/images'];
 
-%opts.name=[ 'models/AcfKAIST-RGB' ];
-%opts.name=[ 'models/AcfKAIST-RGB-T' ];
-%opts.name=[ 'models/AcfKAIST-RGB-T-TM-TO' ];
-%opts.name=[ 'models/AcfKAIST-RGB-T-THOG' ];
-opts.name=[ outDir 'results' ];                               % Output path
+%% ##### CONFIGURATION OPTIONS ############################################
+opts.name=[ outDir bbsNmName ];                               % Output path
 
 % Detection labels to use or ignore
 pLoad={'lbls',{'person'},'ilbls',{'people','person?','cyclist'}};
 opts.pLoad = [pLoad 'hRng',[55 inf], 'vType', {'none'} ];
+%  ########################################################################
 
 %% To handle thermal channel
 opts.imreadf = @imreadHistEq;
