@@ -325,7 +325,8 @@ class kaist(imdb):
                         continue
                     # the VOCdevkit expects 1-based indices
                     for k in xrange(dets.shape[0]):
-                        f.write('{:d} {:f} {:f} {:f} {:f} {:f}\n'.
+                        #f.write('{:d} {:f} {:f} {:f} {:f} {:f}\n'.  # Separation with whitespaces (also working...)
+                        f.write('{:d},{:f},{:f},{:f},{:f},{:f}\n'.  # Separation like in MATLAB detection files
                                 format(im_ind + 1,                          # index
                                        (dets[k, 0] + 1),                    # left
                                        (dets[k, 1] + 1),                    # top
