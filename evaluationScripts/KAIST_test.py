@@ -26,6 +26,7 @@ if __name__ == '__main__':
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name        = "refinedet_vgg16_320x320"  # DEFAULT: "refinedet_vgg16_320x320"
     single_scale    = True  # True: single scale test;  False: multi scale test
+    compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     path_prefix_HOME = "{}/train_test_data".format(os.environ['HOME'])
@@ -40,12 +41,14 @@ if __name__ == '__main__':
         "Path {} does not exist! --> atWORK = ?".format(path_prefix)
 
 
-    kaist_path = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
+    train_test_outPath = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
     test_set = 'kaist_{}_test'.format(subsetName) # Available: 'kaist_Train-all-T_test' or ... (See --> factory.py for all)
 
+    # Set configuration options
     cfg.single_scale_test = single_scale
+    cfg.ROOT_DIR    = train_test_outPath  # Defines output directory for evaluation results
 
-    if '320' in kaist_path:
+    if '320' in train_test_outPath:
         input_size = 320
     else:
         input_size = 512
@@ -54,18 +57,17 @@ if __name__ == '__main__':
     caffe.set_device(GPU_ID)
 
     imdb = get_imdb(test_set)  # In this case, imdb is an instance of class "kaist"!
-    imdb.competition_mode(False)
+    imdb.competition_mode(compete_mode)
     imdb.set_matlab_eval(evalWithMatlab=MatlabEval)
 
-    #prototxt = kaist_path + 'deploy.prototxt'
-    prototxt = os.path.join(kaist_path, 'deploy.prototxt')
-    models = os.listdir(kaist_path)
+    prototxt = os.path.join(train_test_outPath, 'deploy.prototxt')
+    models = os.listdir(train_test_outPath)
 
     mAP = {}    # mean Average Precision
     for model in models:
         if model.find('caffemodel') == -1:
             continue
-        caffemodel = kaist_path + model
+        caffemodel = train_test_outPath + model
         net = caffe.Net(prototxt, caffemodel, caffe.TEST)
         net.name = os.path.splitext(os.path.basename(model))[0]
         cfg.net_name = net.name
@@ -91,7 +93,7 @@ if __name__ == '__main__':
         value = mAP.get(key)
         print("%d\t%.4f"%(key, value))
         templine.append("%d\t%.4f\n"%(key, value))
-    with open(kaist_path + 'mAP.txt', 'w+') as f:
+    with open(train_test_outPath + 'mAP.txt', 'w+') as f:
         f.writelines(templine)
     print("########################################################################")
     print("########################################################################")

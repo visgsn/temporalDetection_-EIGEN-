@@ -235,14 +235,18 @@ __C.single_scale_test = True
 __C.confidence_threshold = 0.01
 
 
-def get_output_dir(imdb, net=None):
+def get_output_dir(imdb, net=None, forKaist=True):
     """Return the directory where experimental artifacts are placed.
     If the directory does not exist, it is created.
 
     A canonical path is built using the name from an imdb and a network
     (if not None).
     """
-    outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput', __C.EXP_DIR, imdb.name))
+    if forKaist:
+        outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput'))
+    else:
+        outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput', __C.EXP_DIR, imdb.name))
+
     if net is not None:
         outdir = osp.join(outdir, net.name)
     if not os.path.exists(outdir):

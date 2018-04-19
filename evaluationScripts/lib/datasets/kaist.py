@@ -271,7 +271,7 @@ class kaist(imdb):
                     'KAIST_' + self._name,
                     'Main',
                     filename)
-                
+
         else:  # Use KAIST specific output dir
             # Example path:
             # ~/code/temporalDetection_-EIGEN-/evaluationScripts/output/default/train-all-T/...
