@@ -7,14 +7,11 @@ function [miss,roc,gt,dt] = kaistTest( varargin )
 % INPUTS
 %  pTest    - parameters (struct or name/value pairs)
 %   .name     - ['REQ'] detector name
-%   .imgDir   - ['REQ'] dir containing test images
 %   .gtDir    - ['REQ'] dir containing test ground truth
 %   .bbsNm    - ['REQ'] file containing detections (.txt format)
 %   .pLoad    - [] params for bbGt>bbLoad for test data (see bbGt>bbLoad)
-%   .pModify  - [] params for acfModify for modifying detector
 %   .thr      - [.5] threshold on overlap area for comparing two bbs
 %   .mul      - [0] if true allow multiple matches to each gt
-%   .reapply  - [0] if true re-apply detector even if bbs already computed
 %   .ref      - [10.^(-2:.25:0)] reference points (see bbGt>compRoc)
 %   .lims     - [3.1e-3 1e1 .05 1] plot axis limits
 %   .show     - [0] optional figure number for display
@@ -34,10 +31,10 @@ function [miss,roc,gt,dt] = kaistTest( varargin )
 % Licensed under the Simplified BSD License [see external/bsd.txt]
 
 % get parameters
-dfs={ 'name','REQ', 'imgDir','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
-  'pModify',[], 'thr',.5,'mul',0, 'reapply',0, 'ref',10.^(-2:.25:0), ...
+dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
+  'thr',.5,'mul',0, 'ref',10.^(-2:.25:0), ...
   'lims',[3.1e-3 1e1 .05 1], 'show',1, 'type', '', 'clr', 'g', 'lineSt', '-' };
-[name,imgDir,gtDir,bbsNm,pLoad,pModify,thr,mul,reapply,ref,lims,show,type,clr,lineSt] = ...
+[name,gtDir,bbsNm,pLoad,thr,mul,ref,lims,show,type,clr,lineSt] = ...
   getPrmDflt(varargin,dfs,1);
 
 % run evaluation using bbGt
