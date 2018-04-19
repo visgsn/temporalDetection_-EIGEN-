@@ -51,7 +51,7 @@ class kaist(imdb):
         # Default to roidb handler
         self._roidb_handler = self.selective_search_roidb
         self._salt = str(uuid.uuid4()).split('-')[0]  # Modified to use only first UUID part (shorter)
-        self._comp_id = 'comp4'
+        self._comp_id = 'comp4'  # DEFAULT: 'comp4'
 
         # PASCAL specific config options
         self.config = {'cleanup'     : True,
@@ -252,40 +252,50 @@ class kaist(imdb):
             else self._comp_id)
         return comp_id
 
-    def _get_voc_results_file_template(self):                                                                           # CHECKED!
-        # VOCdevkit/results/VOC2007/Main/<comp_id>_det_test_aeroplane.txt
-        filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
-        if self._name == "2012":
-            path = os.path.join(
-                self._kaist_path,
-                cfg.net_name,
-                'results',
-                'KAIST_' + self._name,
-                'Main',
-                filename)
-        else:
-            path = os.path.join(
-                self._kaist_path,
-                'results',
-                'KAIST_' + self._name,
-                'Main',
-                filename)
-        return path
+    def _get_voc_results_file_template(self, output_dir=None):                                                          # SELF WRITTEN!
+        if output_dir == None:  # Use standard (OLD)...
+            # VOCdevkit/results/VOC2007/Main/<comp_id>_det_test_aeroplane.txt
+            filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
+            if self._name == "2012":
+                path = os.path.join(
+                    self._kaist_path,
+                    cfg.net_name,
+                    'results',
+                    'KAIST_' + self._name,
+                    'Main',
+                    filename)
+            else:
+                path = os.path.join(
+                    self._kaist_path,
+                    'results',
+                    'KAIST_' + self._name,
+                    'Main',
+                    filename)
+                
+        else:  # Use KAIST specific output dir
+            # Example path:
+            # ~/code/temporalDetection_-EIGEN-/evaluationScripts/output/default/train-all-T/...
+            # KAIST_refinedet_vgg16_320x320_iter_2500/VOC_<comp_id>_detectionBBs_test_<class_name>.txt
+            filename = 'VOC_' + self._get_comp_id() + '_detectionBBs_' + self._image_set + '_{:s}.txt'
+            path = os.path.join(output_dir, filename)
+            return path
 
     def _get_kaist_results_file_template(self, output_dir):                                                             # SELF WRITTEN!
+        # Adapted Format for MATLAB evaluation script evalKAIST.m and piotr-toolbox (Easier to handle!)
         # Example path:
         # ~/code/temporalDetection_-EIGEN-/evaluationScripts/output/default/train-all-T/...
-        # KAIST_refinedet_it50184_320x320_iter_2500/detections_for_matlab/<comp_id>_det_test_person.txt
-        filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
+        # KAIST_refinedet_vgg16_320x320_iter_2500/detections_for_matlab/...
+        # MATLAB_<comp_id>_detectionBBs_test_<class_name>.txt
+        filename = 'MATLAB_' + self._get_comp_id() + '_detectionBBs_' + self._image_set + '_{:s}.txt'
         path = os.path.join(output_dir, "detections_for_matlab", filename)
         return path
 
-    def _write_voc_results_file(self, all_boxes):                                                                       # CHECKED!
+    def _write_voc_results_file(self, all_boxes, outputDir=None):                                                       # CHECKED!
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
                 continue
             print 'Writing {} KAIST results file'.format(cls)
-            filename = self._get_voc_results_file_template().format(cls)
+            filename = self._get_voc_results_file_template(outputDir).format(cls)
             if not os.path.exists(os.path.dirname(filename)):
                 os.makedirs(os.path.dirname(filename))
             with open(filename, 'wt') as f:
@@ -344,7 +354,7 @@ class kaist(imdb):
         for i, cls in enumerate(self._classes):
             if cls == '__background__':
                 continue
-            filename = self._get_voc_results_file_template().format(cls)
+            filename = self._get_voc_results_file_template(output_dir).format(cls)
             rec, prec, ap = kaist_eval(
                 filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
                 use_07_metric=self._use_07_metric)
@@ -389,7 +399,7 @@ class kaist(imdb):
         print("done")
 
     def evaluate_detections(self, all_boxes, output_dir):                                                               # CHECKED!
-        self._write_voc_results_file(all_boxes)
+        self._write_voc_results_file(all_boxes, output_dir)
         self._write_kaist_results_file(all_boxes, output_dir)
         self._do_python_eval(output_dir)
         if self.config['matlab_eval']:
@@ -398,7 +408,7 @@ class kaist(imdb):
             for cls in self._classes:
                 if cls == '__background__':
                     continue
-                filename = self._get_voc_results_file_template().format(cls)
+                filename = self._get_voc_results_file_template(output_dir).format(cls)
                 os.remove(filename)
 
     def set_matlab_eval(self, evalWithMatlab=True):                                                                     # SELF WRITTEN!
