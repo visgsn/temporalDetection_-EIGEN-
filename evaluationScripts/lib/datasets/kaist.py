@@ -50,7 +50,7 @@ class kaist(imdb):
         self._image_index = self._load_image_set_index()
         # Default to roidb handler
         self._roidb_handler = self.selective_search_roidb
-        self._salt = str(uuid.uuid4())
+        self._salt = str(uuid.uuid4()).split('-')[0]  # Modified to use only first UUID part (shorter)
         self._comp_id = 'comp4'
 
         # PASCAL specific config options
