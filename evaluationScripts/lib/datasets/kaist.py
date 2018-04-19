@@ -382,9 +382,10 @@ class kaist(imdb):
         print '-----------------------------------------------------'
         print 'Computing results with the official MATLAB eval code.'
         print '-----------------------------------------------------'
-        # Start MATLAB engineand add toolbox path
+        # Start MATLAB engine and add toolbox path
         mateng = matlab.engine.start_matlab()
-        mateng.addpath(mateng.genpath('~/code/temporalDetection_-EIGEN-/piotr-toolbox-3.40/'))
+        tbPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'piotr-toolbox-3.40')) + '/'
+        mateng.addpath(mateng.genpath( tbPath ))
 
         # Reconsruct detection file name for class 'person', dir to store the results and the KAIST data dir
         detectionFile = self._get_kaist_results_file_template(output_dir).format('person')
