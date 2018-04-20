@@ -9,7 +9,7 @@
 
 import _init_paths
 from fast_rcnn.test import single_scale_test_net, multi_scale_test_net_320, multi_scale_test_net_512
-from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
+from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list, get_output_dir
 from datasets.factory import get_imdb
 import caffe
 import os
@@ -21,10 +21,11 @@ if __name__ == '__main__':
     # Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
     atWork  = True  # Change this in "factory.py", too!
 
-    MatlabEval  = True  # If True: Use additional MATLAB test evaluation
+    doMatlabEval    = True  # If True: Use additional MATLAB test evaluation (on "test-all")
 
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name        = "refinedet_vgg16_320x320"  # DEFAULT: "refinedet_vgg16_320x320"
+    experimentName  = "default"  # Name of evalOutput subfolder (experiment name)
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
@@ -47,18 +48,18 @@ if __name__ == '__main__':
     # Set configuration options
     cfg.single_scale_test = single_scale
     cfg.ROOT_DIR = train_test_outPath  # Defines output directory for evaluation results
+    cfg.EXP_DIR = experimentName
+    imdb = get_imdb(test_set)  # In this case, imdb is an instance of class "kaist"!
+    imdb.competition_mode(compete_mode)
+    imdb.set_matlab_eval(evalWithMatlab=doMatlabEval)
+
+    caffe.set_mode_gpu()
+    caffe.set_device(GPU_ID)
 
     if '320' in train_test_outPath:
         input_size = 320
     else:
         input_size = 512
-
-    caffe.set_mode_gpu()
-    caffe.set_device(GPU_ID)
-
-    imdb = get_imdb(test_set)  # In this case, imdb is an instance of class "kaist"!
-    imdb.competition_mode(compete_mode)
-    imdb.set_matlab_eval(evalWithMatlab=MatlabEval)
 
     prototxt = os.path.join(train_test_outPath, 'deploy.prototxt')
     models = os.listdir(train_test_outPath)
@@ -106,6 +107,7 @@ if __name__ == '__main__':
     keys = mAP.keys()
     keys.sort()
     templine = []
+    mAP_outFile = os.path.join(get_output_dir(imdb, forKaist=True), 'mAP_mPrec_mRec.txt')
     print("########################################################################")
     print("########################################################################")
     for key in keys:
@@ -114,7 +116,7 @@ if __name__ == '__main__':
         value_mRec  = mRec.get(key)
         print("%d\t%.4f\t%.4f\t%.4f" % (key, value_mAP, value_mPrec, value_mRec))
         templine.append("%d\t%.4f\t%.4f\t%.4f\n" % (key, value_mAP, value_mPrec, value_mRec))
-    with open(train_test_outPath + 'mAP.txt', 'w+') as f:
+    with open(mAP_outFile, 'w+') as f:
         print("\n")
         logging.info("Results can be found under: " + str(train_test_outPath))
         f.writelines(templine)

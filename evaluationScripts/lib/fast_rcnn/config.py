@@ -255,7 +255,7 @@ def get_output_dir(imdb, net=None, forKaist=True):
     (if not None).
     """
     if forKaist:
-        outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput'))
+        outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput', __C.EXP_DIR))
     else:
         outdir = osp.abspath(osp.join(__C.ROOT_DIR, 'evalOutput', __C.EXP_DIR, imdb.name))
 
