@@ -30,7 +30,6 @@ function [miss,roc,gt,dt] = evalKAIST(outDir, dataDir, bbsNmFile)
 %% extract training and testing images and ground truth
 cd(fileparts(which('evalKAIST.m')));
 addpath( genpath( '..' ) );
-skip=20;
 [~,bbsNmName,~] = fileparts(bbsNmFile);
 
 %% set up opts for training detector (see acfTrain) (ONLY DUMMY VARIABLES!)
@@ -41,7 +40,6 @@ opts.name=[ outDir bbsNmName ];                               % Output path
 
 % Detection labels to use or ignore
 pLoad={'lbls',{'person'},'ilbls',{'people','person?','cyclist'}};
-opts.pLoad = [pLoad 'hRng',[55 inf], 'vType', {'none'} ];
 %  ########################################################################
 
 %% run detector on a sample image (only example) (see acfDetect)

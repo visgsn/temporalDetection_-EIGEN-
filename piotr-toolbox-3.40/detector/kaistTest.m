@@ -1,4 +1,4 @@
-function [miss,roc,gt,dt] = kaistTest( varargin )
+function [laMiss,roc,gt,dt] = kaistTest( varargin )
 % Test aggregate channel features object detector given ground truth.
 %
 % USAGE
@@ -40,8 +40,9 @@ dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
 % run evaluation using bbGt
 [gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);
 [gt,dt] = bbGt('evalRes',gt,dt,thr,mul);
-[fp,tp,score,miss] = bbGt('compRoc',gt,dt,1,ref);
-miss=exp(mean(log(max(1e-10,1-miss)))); roc=[score fp tp];
+[fp,tp,score,detR] = bbGt('compRoc',gt,dt,1,ref);  % detR = Detection Rate
+laMiss=exp(mean(log(max(1e-10,1-detR))));  % miss=1-detR, laMiss: log-average
+roc=[score fp tp];
 
 % optionally plot roc
 if( ~show ), return; end
@@ -49,7 +50,7 @@ figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per imag
   'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref);
         
 
-title(sprintf('log-average miss rate = %.2f%%',miss*100));
+title(sprintf('log-average miss rate = %.2f%%',laMiss*100));
 savefig([name type 'Roc'],show,'png');
 
 end
