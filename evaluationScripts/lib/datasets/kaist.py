@@ -397,7 +397,7 @@ class kaist(imdb):
         print("Matlab dataDir      : " + str(data_dir))
 
         # Call MATLAB evaluation script
-        [cfg.miss, cfg.roc, cfg.gt, cfg.dt] = mateng.evalKAIST(result_dir, data_dir, detectionFile ,nargout=4)
+        [cfg.miss, cfg.roc, cfg.gt, cfg.dt] = mateng.evalKAIST(result_dir, data_dir, detectionFile, 0,nargout=4)
 
         print("done")
 

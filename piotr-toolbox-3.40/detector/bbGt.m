@@ -692,7 +692,7 @@ function [hs,hImg] = showRes( I, gt, dt, varargin )
 %
 % See also bbGt, bbGt>evalRes
 dfs={'evShow',1,'gtShow',1,'dtShow',1,'cols','krg',...
-  'gtLs','-','dtLs','--','lw',3};
+  'gtLs','-','dtLs','--','lw',1};  % Standard: lw = 3
 [evShow,gtShow,dtShow,cols,gtLs,dtLs,lw]=getPrmDflt(varargin,dfs,1);
 % optionally display image
 if(ischar(I)), I=imread(I); end
