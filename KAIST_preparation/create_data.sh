@@ -31,7 +31,7 @@ mapfile="$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
 
 
 
-if [ $atWORK ]
+if [ $atWORK -eq 1 ]
 then
   RefineDet_ROOT=$RefineDet_ROOT_WORK
   data_root_dir=$data_root_dir_WORK
