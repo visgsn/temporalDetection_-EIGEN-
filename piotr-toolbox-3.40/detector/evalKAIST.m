@@ -29,8 +29,8 @@ function [miss,roc,gt,dt] = evalKAIST(inOutDir, dataDir, bbsNmFile, showRes)
 
 
 %% Initialize basic variables and paths
-cd(fileparts(which('evalKAIST.m')));
-addpath( genpath( '..' ) );
+tmpPath = fileparts(which('evalKAIST.m'));
+addpath(genpath(sprintf(tmpPath, '/..')));
 [~,bbsNmName,~] = fileparts(bbsNmFile);
 
 if ~exist(bbsNmFile, 'file')

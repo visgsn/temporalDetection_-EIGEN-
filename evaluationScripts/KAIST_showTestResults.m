@@ -29,7 +29,7 @@
 %% Set up necessary path variables
 %##########################################################################
 % Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
-atWork = false;
+atWork = true;
 
 iterToTest     = '50184';  % Specify which solver iteration Nr. to test
 
@@ -80,7 +80,7 @@ end
 
 %% Add Toolbox path to matlab path
 thisDir = fileparts(which('KAIST_showTestResults.m'));
-piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/']
+piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/'];
 addpath( genpath( piotrToolboxPath ) );
 
 
