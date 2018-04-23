@@ -1,35 +1,13 @@
-% Demo for aggregate channel features object detector on KAIST dataset.
-%
-% See also acfReadme.m
-%
-% Piotr's Computer Vision Matlab Toolbox      Version 3.40
-% Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
-% Licensed under the Simplified BSD License [see external/bsd.txt]
-%
-% 2015.06.02. Modified by Soonmin Hwang [smhwang-at-rcv.kaist.ac.kr]
-% 2015.07.27. Some bugs are fixed. 
-%   - dbInfo2.m
-%   - detector/acfDemoKAIST.m
-%   - detector/acfTest.m
-%   - channels/chnsPyramid.m
-%   - channels/TMagTOri.m (added)
-%
-% INPUTS
-%  outDir    - Directory to save test results (With trailing '/'!)
-%  dataDir   - Directory containing KAIST data (DEFAULT: $KAIST_root/data-kaist/)
-%  bbsNmFile - Detections (must be of form [x y w h wt bbType] as .txt file)
-%
-% OUTPUTS
-%  miss      - log-average miss rate computed at reference points
-%  roc       - [nx3] n data points along roc of form [score fp tp]
-%  gt        - [mx5] ground truth results [x y w h match] (see bbGt>evalRes)
-%  dt        - [nx6] detect results [x y w h score match] (see bbGt>evalRes)
+% This script can be used to display and analyze the detection results.
+% 
+% IMPORTANT: KAIST_test.py has to be executed first, in order to generate
+%            all necessary files for this script!
 
 
 %% Set up necessary path variables
 %##########################################################################
 % Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
-atWork = false;
+atWork = true;
 
 iterToTest     = '50184';  % Specify which solver iteration Nr. to test
 
@@ -80,7 +58,7 @@ end
 
 %% Add Toolbox path to matlab path
 thisDir = fileparts(which('KAIST_showTestResults.m'));
-piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/']
+piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/'];
 addpath( genpath( piotrToolboxPath ) );
 
 

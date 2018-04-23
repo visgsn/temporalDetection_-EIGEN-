@@ -25,10 +25,6 @@ function [hs, hImg] = kaistShow( varargin )
 % EXAMPLE
 %
 % See also acfTrain, acfDetect, acfModify, acfDemoInria, bbGt
-%
-% Piotr's Computer Vision Matlab Toolbox      Version 3.40
-% Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
-% Licensed under the Simplified BSD License [see external/bsd.txt]
 
 % get parameters
 dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'imgNms','REQ', ...
@@ -38,32 +34,66 @@ dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'imgNms','REQ', ...
 [name,gtDir,bbsNm,imgNms,pLoad,thr,mul,ref,lims,show,type,clr,lineSt] = ...
   getPrmDflt(varargin,dfs,1);
 
+% Open figure and display buttons for user interaction (window control)
+figure();
+a = uicontrol('Style','pushbutton', 'Position',[20 220 60 40],...
+              'String','ABORT', 'Callback',@forwardBackward);
+f = uicontrol('Style','pushbutton', 'Position',[20 170 60 40],...
+              'String','>', 'Callback',@forwardBackward);
+b = uicontrol('Style','pushbutton', 'Position',[20 120 60 40],...
+              'String','<', 'Callback',@forwardBackward);
+ff = uicontrol('Style','pushbutton', 'Position',[20 70 60 40],...
+               'String','>>', 'Callback',@forwardBackward);
+fb = uicontrol('Style','pushbutton', 'Position',[20 20 60 40],...
+               'String','<<', 'Callback',@forwardBackward);
+sl = uicontrol('Style','slider', 'Position',[100 20 400 15],...
+               'Min',1, 'Max',length(imgNms), 'Value',1,...
+               'String','goto', 'Callback',@forwardBackward);
+
 % run evaluation using bbGt
 [gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);
 [gt,dt] = bbGt('evalRes',gt,dt,thr,mul);
-for imgCount = 1: length(imgNms)
+imgCount = 1;
+while imgCount <= length(imgNms)
     img = imread(imgNms{imgCount});
     grtr = gt{imgCount};
     det = dt{imgCount};
-    [hs,hImg] = bbGt( 'showRes', img, grtr, det);                      % Initialisierung von hs und hImg mit Nullen vor Schleife
-    waitforbuttonpress;  % Await user interaction to proceed
+    [hs,hImg] = bbGt( 'showRes', img, grtr, det);
+    
+    % print current array index and image name
+    fprintf(...
+        'Current image (iter, name): %d/%d, %s\n',...
+        imgCount, length(imgNms), imgNms{imgCount});
+    
+    % Pause execution and wait for user input
+    uiwait(gcf);
 end
 
 
-
-
-% [fp,tp,score,detR] = bbGt('compRoc',gt,dt,1,ref);  % detR = Detection Rate
-% laMiss=exp(mean(log(max(1e-10,1-detR))));  % miss=1-detR, laMiss: log-average
-% roc=[score fp tp];
-
-
-% optionally plot roc
-% if( ~show ), return; end
-% figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
-%   'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref);
-%         
-% 
-% title(sprintf('log-average miss rate = %.2f%%',laMiss*100));
-% savefig([name type 'Roc'],show,'png');
+%% Function to manage user inputs
+function forwardBackward(source, event)
+    % Adapt values according to input
+    if source.String == ">"
+        imgCount = imgCount + 1;
+    elseif source.String == "<"
+        imgCount = imgCount - 1;
+    elseif source.String == ">>"
+        imgCount = imgCount + 20;
+    elseif source.String == "<<"
+        imgCount = imgCount - 20;
+    elseif source.String == "goto"
+        imgCount = floor(source.Value);
+    elseif source.String == "ABORT"
+        error('Program aborted by user.')
+    end
+    % Keep value inside feasible borders
+    if imgCount < 1
+        imgCount = 1;
+    end
+    % Assign current value to slider
+    sl.Value = imgCount;
+    % Proceed execution
+    uiresume(gcbf);
+end
 
 end

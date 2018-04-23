@@ -1,19 +1,5 @@
 function [miss,roc,gt,dt] = evalKAIST(inOutDir, dataDir, bbsNmFile, showRes)
-% Demo for aggregate channel features object detector on KAIST dataset.
-%
-% See also acfReadme.m
-%
-% Piotr's Computer Vision Matlab Toolbox      Version 3.40
-% Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
-% Licensed under the Simplified BSD License [see external/bsd.txt]
-%
-% 2015.06.02. Modified by Soonmin Hwang [smhwang-at-rcv.kaist.ac.kr]
-% 2015.07.27. Some bugs are fixed. 
-%   - dbInfo2.m
-%   - detector/acfDemoKAIST.m
-%   - detector/acfTest.m
-%   - channels/chnsPyramid.m
-%   - channels/TMagTOri.m (added)
+% This script can be use to evaluate and show detection Results.
 %
 % INPUTS
 %  outDir    - Directory to save test results (With trailing "/"!)
@@ -29,8 +15,8 @@ function [miss,roc,gt,dt] = evalKAIST(inOutDir, dataDir, bbsNmFile, showRes)
 
 
 %% Initialize basic variables and paths
-cd(fileparts(which('evalKAIST.m')));
-addpath( genpath( '..' ) );
+tmpPath = fileparts(which('evalKAIST.m'));
+addpath(genpath(sprintf(tmpPath, '/..')));
 [~,bbsNmName,~] = fileparts(bbsNmFile);
 
 if ~exist(bbsNmFile, 'file')
