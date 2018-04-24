@@ -31,8 +31,8 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 10000  # Maximum number of solver iterations (100368 --> 2x all KAIST train images)
-snapshot_train  = 2000  # Number of iterations to take a snapshot
+max_iter_train  = 200000  # Maximum number of solver iterations (100368 --> 2x all KAIST train images)
+snapshot_train  = 20000  # Number of iterations to take a snapshot
 base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = True  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
@@ -41,7 +41,7 @@ useResize512    = False  # False: 320x320   True: 512x512
 batch_size_HOME = 8
 batch_size_WORK = 30
 
-job_name_template = "refdet_i10k_DROPOUT_test_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "refdet_i200k_lr001_DROPOUT_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
