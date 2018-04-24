@@ -31,19 +31,20 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 50184  # Maximum number of solver iterations (100368 --> 2x all KAIST train images)
-snapshot_train  = 2500  # Number of iterations to take a snapshot
-base_lr_train   = 0.0004  # Learning rate to start with (ORIGINAL: 0.0005)
+max_iter_train  = 200000  # Maximum number of solver iterations (100368 --> 2x all KAIST train images)
+snapshot_train  = 20000  # Number of iterations to take a snapshot
+base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
+useDropout      = False  # If true: Use dropout for training
 
 # Batch size for training
 batch_size_HOME = 8
 batch_size_WORK = 30
 
-caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])  # The directory which contains the caffe code.
-
-job_name_template = "refinedet_vgg16_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "refdet_i200k_lr001_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
+
+caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])  # The directory which contains the caffe code.
 
 # Path to dataset root (e.g. "/home/gueste/data/KAIST")
 dataset_root_HOME = "{}/data/{}".format(os.environ['HOME'], dataset_name)
@@ -415,7 +416,7 @@ solver_param = {
     'base_lr': base_lr_train,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [30000, 40000, 45000],
+    'stepvalue': [100000, 160000, 180000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
@@ -476,7 +477,7 @@ net.data, net.label = CreateAnnotatedDataLayer(train_data, batch_size=batch_size
         train=True, output_label=True, label_map_file=label_map_file,
         transform_param=train_transform_param, batch_sampler=batch_sampler)
 
-VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=False)
+VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=useDropout)
 
 AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult)
 arm_source_layers.reverse()
