@@ -35,6 +35,7 @@ max_iter_train  = 200000  # Maximum number of solver iterations (100368 --> 2x a
 snapshot_train  = 20000  # Number of iterations to take a snapshot
 base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = False  # If true: Use dropout for training
+useResize512    = False  # False: 320x320   True: 512x512
 
 # Batch size for training
 batch_size_HOME = 8
@@ -63,9 +64,11 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 
     # Add additional convolutional layers.
     # 320/32: 10 x 10
+    # 512/32: 16 x 16
     from_layer = net.keys()[-1]
 
     # 320/64: 5 x 5
+    # 512/64: 8 x 8
     out_layer = "conv6_1"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 1, 0, 1, lr_mult=lr_mult)
 
@@ -126,6 +129,7 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 dataset_root = dataset_root_WORK if atWORK else dataset_root_HOME
 assert os.path.exists(dataset_root), \
     "Path {} does not exist! --> atWORK = ?".format(dataset_root)
+newSize = 512 if useResize512 else 320
 
 
 # The database file for training data. Created by create_data.sh
@@ -134,8 +138,8 @@ train_data = "{}/examples/{}/{}/{}_trainval_lmdb".format(caffe_root, dataset_nam
 test_data = "{}/examples/{}/{}/{}_test_lmdb".format(caffe_root, dataset_name, subsetName, dataset_name)
 
 # Specify the batch sampler.
-resize_width = 320
-resize_height = 320
+resize_width = newSize
+resize_height = newSize
 resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
         {
@@ -354,11 +358,18 @@ loss_param = {
 
 # parameters for generating priors.
 # minimum dimension of input image
+### For 320x320
 # min_dim = 320
 # conv4_3 ==> 40 x 40
 # conv5_3 ==> 20 x 20
 # fc7 ==> 10 x 10
 # conv6_2 ==> 5 x 5
+### For 512x512
+# min_dim = 512
+# conv4_3 ==> 64 x 64
+# conv5_3 ==> 32 x 32
+# fc7 ==> 16 x 16
+# conv6_2 ==> 8 x 8
 arm_source_layers = ['conv4_3', 'conv5_3', 'fc7', 'conv6_2']
 odm_source_layers = ['P3', 'P4', 'P5', 'P6']
 min_sizes = [32, 64, 128, 256]
