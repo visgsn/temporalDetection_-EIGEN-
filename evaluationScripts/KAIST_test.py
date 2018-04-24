@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name        = "refinedet_vgg16_320x320"  # DEFAULT: "refinedet_vgg16_320x320"
-    experimentName  = "default"  # Name of evalOutput subfolder (experiment name)
+    experimentName  = "singleScale"  # Name of evalOutput subfolder (experiment name)
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
