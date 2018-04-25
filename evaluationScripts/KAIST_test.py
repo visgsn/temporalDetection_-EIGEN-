@@ -7,6 +7,7 @@
     Written by Steffen Guentert
 '''
 
+import matlab.engine
 import _init_paths
 from fast_rcnn.test import single_scale_test_net, multi_scale_test_net_320, multi_scale_test_net_512
 from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list, get_output_dir
