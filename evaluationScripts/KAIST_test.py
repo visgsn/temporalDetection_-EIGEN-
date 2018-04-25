@@ -31,7 +31,7 @@ if __name__ == '__main__':
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     visualizeDets   = False  # Show Detections while testing?
 
-    GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+    useGPU          = True  # Default: True
 
     path_prefix_HOME = "{}/train_test_data".format(os.environ['HOME'])
     path_prefix_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
@@ -56,8 +56,13 @@ if __name__ == '__main__':
     imdb.competition_mode(compete_mode)
     imdb.set_matlab_eval(evalWithMatlab=doMatlabEval)
 
-    caffe.set_mode_gpu()
-    caffe.set_device(GPU_ID)
+    # Set CPU- or GPU-mode
+    if useGPU:
+        GPU_ID = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
+        caffe.set_mode_gpu()
+        caffe.set_device(GPU_ID)
+    else:
+        caffe.set_mode_cpu()
 
     if '320' in train_test_outPath:
         input_size = 320
