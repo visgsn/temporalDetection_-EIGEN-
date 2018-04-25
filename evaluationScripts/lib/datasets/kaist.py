@@ -5,7 +5,6 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-import matlab.engine
 import os
 from datasets._usefulFunctions import fileParts
 from datasets.imdb import imdb
@@ -20,6 +19,9 @@ import subprocess
 import uuid
 from kaist_eval import kaist_eval
 from fast_rcnn.config import cfg
+import matlab.engine
+
+
 
 class kaist(imdb):
     def __init__(self, image_set, name, kaist_path=None, kaist_classes=None):
