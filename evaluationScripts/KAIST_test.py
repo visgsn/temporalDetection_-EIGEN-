@@ -28,6 +28,8 @@ if __name__ == '__main__':
     experimentName  = "singleScale"  # Name of evalOutput subfolder (experiment name)
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
+    visualizeDets   = False  # Show Detections while testing?
+
     GPU_ID          = int(sys.argv[1])  # Adapted to use with script "StartIfGPUFree.py". GPU to use for execution
 
     path_prefix_HOME = "{}/train_test_data".format(os.environ['HOME'])
@@ -83,12 +85,12 @@ if __name__ == '__main__':
         except:
             iter = 000000
         if single_scale is True:
-            single_scale_test_net(net, imdb, targe_size=input_size)
+            single_scale_test_net(net, imdb, targe_size=input_size, vis=visualizeDets)
         else:
             if input_size == 320:
-                multi_scale_test_net_320(net, imdb)
+                multi_scale_test_net_320(net, imdb, vis=visualizeDets)
             else:
-                multi_scale_test_net_512(net, imdb)
+                multi_scale_test_net_512(net, imdb, vis=visualizeDets)
         mAP[iter]   = cfg.mAP
         mPrec[iter] = cfg.prec
         mRec[iter]  = cfg.rec
