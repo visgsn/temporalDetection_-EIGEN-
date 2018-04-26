@@ -20,9 +20,9 @@ possible_gpus = {}
 
 ##### Configuration variables ##########################################################################################
 # Define all possible GPUs for your process as list, e.g. ["0", "1"], with the corresponding server name
-possible_gpus['deneb']  = ["0", "1", "2", "3"]  # ***deneb***
-possible_gpus['zaurak'] = ["1", "3"]            # ***zaurak***
-possible_gpus['sadr']   = ["0"]                 # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
+possible_gpus['d']  = ["0", "1", "2", "3"]  # ***deneb***
+possible_gpus['z']  = ["1", "3"]            # ***zaurak***
+possible_gpus['s']  = ["0"]                 # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
 
 check_interval = 10                             # Time interval to check if any GPU is free
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
@@ -38,7 +38,7 @@ def main():
     while True:
         print "----------------------------------------------------------------"
         # Variable declarations
-        remaining_gpus = possible_gpus[:]
+        remaining_gpus = possible_gpus_extracted[:]
         start_line_found = False
 
         # Test for free GPUs
