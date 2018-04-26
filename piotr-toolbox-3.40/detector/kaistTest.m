@@ -53,7 +53,7 @@ f = figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per 
 title(sprintf('log-average miss rate = %.2f%%',laMiss*100));
 %savefig([name type 'Roc'],show,'png');     %ORIGINAL
 frame=getframe(f);
-[X,map]=frame2im(frame);
-imwrite(X,[name type 'Roc'], 'png');
+[X,~]=frame2im(frame);
+imwrite(X,[name type 'Roc' '.png'], 'png');
 
 end
