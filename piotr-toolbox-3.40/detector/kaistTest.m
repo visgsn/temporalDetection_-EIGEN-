@@ -46,11 +46,14 @@ roc=[score fp tp];
 
 % optionally plot roc
 if( ~show ), return; end
-figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
+f = figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
   'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref);
         
 
 title(sprintf('log-average miss rate = %.2f%%',laMiss*100));
-savefig([name type 'Roc'],show,'png');
+%savefig([name type 'Roc'],show,'png');     %ORIGINAL
+frame=getframe(f);
+[X,map]=frame2im(frame);
+imwrite(X,[name type 'Roc'], 'png');
 
 end
