@@ -38,8 +38,8 @@ useDropout      = True  # If true: Use dropout for training
 useResize512    = True  # False: 320x320   True: 512x512
 
 # Batch size for training
-batch_size_HOME = 8
-batch_size_WORK = 30
+batch_size_HOME = 3
+batch_size_WORK = 10
 
 job_name_template = "refdet_i200k_lr001_DROPOUT_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
