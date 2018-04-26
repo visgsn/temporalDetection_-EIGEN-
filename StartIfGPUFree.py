@@ -1,5 +1,5 @@
 '''
-    USAGE: python StartToTrainIfGPUFree <Script_to_start_on_a_GPU.py>
+    USAGE: python StartToTrainIfGPUFree <Script_to_start_on_a_GPU.py> <GPU_list_to_use>
 
     (Insert e.g.
 
@@ -14,17 +14,24 @@ import subprocess
 import sys
 from time import sleep
 
+possible_gpus = {}
 
-### Configuration variables ###
-# Define all possible GPUs for your process as list, e.g. ["0", "1"]
-#possible_gpus =     ["0", "1", "2", "3"]    # ***deneb***
-possible_gpus =     ["1", "3"]              # ***zaurak***
-#possible_gpus =     ["0"]                   # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
 
-check_interval =    10                      # Time interval to check if any GPU is free
+
+##### Configuration variables ##########################################################################################
+# Define all possible GPUs for your process as list, e.g. ["0", "1"], with the corresponding server name
+possible_gpus['deneb']  = ["0", "1", "2", "3"]  # ***deneb***
+possible_gpus['zaurak'] = ["1", "3"]            # ***zaurak***
+possible_gpus['sadr']   = ["0"]                 # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
+
+check_interval = 10                             # Time interval to check if any GPU is free
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+########################################################################################################################
 
 
+
+# Choose possible GPUs from given list
+possible_gpus_extracted = possible_gpus[str(sys.argv[2])]
 
 def main():
     # Wait until one of the GPUs is free (no process started)
