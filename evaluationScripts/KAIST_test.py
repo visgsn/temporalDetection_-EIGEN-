@@ -70,7 +70,7 @@ if __name__ == '__main__':
         input_size = 512
 
     prototxt = os.path.join(train_test_outPath, 'deploy.prototxt')
-    models = os.listdir(train_test_outPath)
+    models = sorted(os.listdir(train_test_outPath), key=str.lower)
 
     mAP = {}    # mean Average Precision
     mPrec = {}  # mean Precision
