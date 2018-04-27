@@ -23,8 +23,10 @@ possible_gpus = {}
 possible_gpus['d']  = ["0", "1", "2", "3"]  # ***deneb***
 possible_gpus['z']  = ["1", "3"]            # ***zaurak***
 possible_gpus['s']  = ["0"]                 # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
+possible_gpus['h']  = ["0"]                 # ***at Home***
 
-check_interval = 10                             # Time interval to check if any GPU is free
+check_interval      = 5                     # Time interval to check if any GPU is free
+interval_to_disp    = 12 * 5                # Display status every interval_to_disp check intervals
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
@@ -34,9 +36,13 @@ logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:
 possible_gpus_extracted = possible_gpus[str(sys.argv[2])]
 
 def main():
+    # Init counter
+    counter = 0
+
     # Wait until one of the GPUs is free (no process started)
     while True:
-        print "----------------------------------------------------------------"
+        if counter % interval_to_disp == 0:  # Only print this e.g. once every minute
+            print "\n----------------------------------------------------------------"
         # Variable declarations
         remaining_gpus = possible_gpus_extracted[:]
         start_line_found = False
@@ -76,7 +82,10 @@ def main():
                     return 0
 
                 elif stripped_output[0] == "+" or len(remaining_gpus) == 0:     # No free GPUs --> Try again later
-                    logging.info("No free GPUs --> Try again later")
+                    if counter % interval_to_disp == 0:  # Only print this e.g. once a minute
+                        logging.info("No free GPUs --> Try again later")
+                    sys.stdout.write('.')
+                    sys.stdout.flush()
                     logging.debug("List of remaining GPUs: " + str(remaining_gpus))
                     break
 
@@ -92,6 +101,7 @@ def main():
 
         # Wait for specified time interval to check again!
         sleep(check_interval)
+        counter = counter + 1
 
 
 # MAIN
