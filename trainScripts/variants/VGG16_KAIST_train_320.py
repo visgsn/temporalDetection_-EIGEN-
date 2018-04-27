@@ -37,9 +37,11 @@ base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = False  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
 
-# Batch size for training
-batch_size_HOME = 8
-batch_size_WORK = 30
+# Batch size for training (Actual batch size on Hardware)
+batch_size_HOME     = 8
+batch_size_WORK     = 30
+# Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
+accum_batch_size    = 30  # Must be a multiple of batch_size
 
 job_name_template = "refdet_i200k_lr001_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
@@ -126,9 +128,11 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
 
 
 ############## Modify the following parameters accordingly ##############
+# Set dataset root according to configuration
 dataset_root = dataset_root_WORK if atWORK else dataset_root_HOME
 assert os.path.exists(dataset_root), \
     "Path {} does not exist! --> atWORK = ?".format(dataset_root)
+# Set image resize parameter according to configuration
 newSize = 512 if useResize512 else 320
 
 
@@ -395,8 +399,9 @@ num_gpus = len(gpulist)
 # Divide the mini-batch to different GPUs.
 #batch_size = 32                                                        # ORIGINAL
 batch_size = batch_size_WORK if atWORK else batch_size_HOME             # Work: 26, Home: 8
+assert accum_batch_size % batch_size == 0, \
+    "accum_batch_size has to be a multiple of batch_size!"              # Check batch size
 #accum_batch_size = 32                                                  # ORIGINAL
-accum_batch_size = batch_size_WORK if atWORK else batch_size_HOME       # Work: 26, Home: 8
 iter_size = accum_batch_size / batch_size
 solver_mode = P.Solver.CPU
 device_id = 0
