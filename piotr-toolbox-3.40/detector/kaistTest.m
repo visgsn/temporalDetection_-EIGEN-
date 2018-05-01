@@ -30,30 +30,83 @@ function [laMiss,roc,gt,dt] = kaistTest( varargin )
 % Copyright 2014 Piotr Dollar.  [pdollar-at-gmail.com]
 % Licensed under the Simplified BSD License [see external/bsd.txt]
 
-% get parameters
+%% get parameters
 dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
   'thr',.5,'mul',0, 'ref',10.^(-2:.25:0), ...
   'lims',[3.1e-3 1e1 .05 1], 'show',1, 'type', '', 'clr', 'g', 'lineSt', '-' };
 [name,gtDir,bbsNm,pLoad,thr,mul,ref,lims,show,type,clr,lineSt] = ...
   getPrmDflt(varargin,dfs,1);
 
-% run evaluation using bbGt
+%% run evaluation using bbGt
 [gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);
 [gt,dt] = bbGt('evalRes',gt,dt,thr,mul);
-[fp,tp,score,detR] = bbGt('compRoc',gt,dt,1,ref);  % detR = Detection Rate
+
+
+%% ROC (Log-average miss rate)
+[fp,tp,scoreROC,detR] = bbGt('compRoc',gt,dt,1,ref);  % detR = Detection Rate
 laMiss=exp(mean(log(max(1e-10,1-detR))));  % miss=1-detR, laMiss: log-average
-roc=[score fp tp];
+roc=[scoreROC fp tp];
 
-% optionally plot roc
-if( ~show ), return; end
-f = figure(show); plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
+% Plot results
+f = figure(show);
+plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
   'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref);
-        
-
-title(sprintf('log-average miss rate = %.2f%%',laMiss*100));
-%savefig([name type 'Roc'],show,'png');     %ORIGINAL
+title(sprintf('log-average miss rate = %.2f%%',laMiss * 100));
+% Save figure and image of figure
+savefig([name type '_ROC' '.fig']);
 frame=getframe(f);
 [X,~]=frame2im(frame);
-imwrite(X,[name type 'Roc' '.png'], 'png');
+imwrite(X,[name type '_ROC' '.png'], 'png');
+close(f);  % Close old figure
+
+%% ROC (TP and FP)
+% Plot results
+f = figure(show);
+f.Position(3) = f.Position(3) * 2;  % Double figure width
+subplot(1,2,1);
+plot(fp, tp, 'b', 'LineWidth', 4);
+grid on;
+title("true / false positives per image");
+xlabel("FPPI [1 / image]"); ylabel("TPPI [1 / image]");
+% TP and FP over score
+subplot(1,2,2);
+plot(scoreROC, tp, 'g', scoreROC, fp, 'r', 'LineWidth', 4);
+grid on;
+legend("TPPI", "FPPI");
+title("true / false positives per image w.r.t. score");
+xlabel("score [%]"); ylabel("[1 / image]");
+% Save figure and image of figure
+savefig([name type '_ROC-TP-FP' '.fig']);
+frame=getframe(f);
+[X,~]=frame2im(frame);
+imwrite(X,[name type '_ROC-TP-FP' '.png'], 'png');
+close(f);  % Close old figure
+
+%% Precision and Recall
+[rec,prec,scorePR,refPrec] = bbGt('compRoc',gt,dt,0,ref);
+pr=[scorePR rec prec];
+
+% Plot results
+f = figure(show);
+f.Position(3) = f.Position(3) * 2;  % Double figure width
+subplot(1,2,1);
+plot(rec * 100, prec * 100, 'b', 'LineWidth', 4);
+axis([0 100 0 100]); grid on;
+title("precision and recall");
+xlabel("recall [%]"); ylabel("precision [%]");
+% Precision and recall over score
+subplot(1,2,2);
+plot(scorePR, prec * 100, 'g', scorePR, rec * 100, 'b', 'LineWidth', 4);
+axis([0 100 0 100]); grid on;
+legend("precision", "recall");
+title("precision / recall w.r.t. score");
+xlabel("score [%]"); ylabel("[%]");
+% Save figure and image of figure
+savefig([name type '_PR' '.fig']);
+frame=getframe(f);
+[X,~]=frame2im(frame);
+imwrite(X,[name type '_PR' '.png'], 'png');
+close(f);  % Close old figure
+
 
 end
