@@ -31,9 +31,9 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 40000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
-snapshot_train  = 5000  # Number of iterations to take a snapshot
-base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
+max_iter_train  = 100000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+snapshot_train  = 10000  # Number of iterations to take a snapshot
+base_lr_train   = 0.00001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = True  # If true: Use dropout for training
 useResize512    = True  # False: 320x320   True: 512x512
 
@@ -43,7 +43,7 @@ batch_size_WORK     = 10
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 30  # Must be a multiple of batch_size
 
-job_name_template = "refdet_i40k_Adam_DROPOUT_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "refdet_i100k_Adam_DROPOUT_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
@@ -430,11 +430,14 @@ solver_param = {
     # Train parameters
     #'base_lr': base_lr,                        # ORIGINAL
     'base_lr': base_lr_train,
-    'weight_decay': 0.0005,
-    'lr_policy': "multistep",
-    'stepvalue': [100000, 160000, 180000],
-    'gamma': 0.1,
+    ##'weight_decay': 0.0005,
+    'lr_policy': "fixed",
+    ##'stepvalue': [100000, 160000, 180000],
+    ##'gamma': 0.1,
     'momentum': 0.9,
+    'momentum2': 0.999,
+    'delta': 0.00000001,
+    'stepsize': 50,            #?
     'iter_size': iter_size,
     #'max_iter': 120000,                        # ORIGINAL
     'max_iter': max_iter_train,                 # 100368 --> 2x all KAIST train images
