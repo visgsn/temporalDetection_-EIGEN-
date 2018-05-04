@@ -109,4 +109,8 @@ imwrite(X,[name type '_PR' '.png'], 'png');
 close(f);  % Close old figure
 
 
+%% Save workspace variables to file for further evaluation
+save([name type '_WsVariables' '.mat']);
+
+
 end
