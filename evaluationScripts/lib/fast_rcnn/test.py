@@ -212,31 +212,39 @@ def soft_bbox_vote(det):
     return dets
 
 
-def single_scale_test_net(net, imdb, targe_size=320, vis=False):
+def single_scale_test_net(net, imdb, targe_size=320, vis=False, redoInference=True):
     num_images = len(imdb.image_index)
     all_boxes = [[[] for _ in xrange(num_images)] for _ in xrange(imdb.num_classes)]
     output_dir = get_output_dir(imdb, net)
-
-    for i in xrange(num_images):
-        im = cv2.imread(imdb.image_path_at(i))
-        det = im_detect(net, im, targe_size)
-
-        for j in xrange(1, imdb.num_classes):
-            inds = np.where(det[:, -1] == j)[0]
-            if inds.shape[0] > 0:
-                cls_dets = det[inds, :-1].astype(np.float32)
-                if 'coco' in imdb.name:
-                    keep = soft_nms(cls_dets, sigma=0.5, Nt=0.30, threshold=cfg.confidence_threshold, method=1)
-                    cls_dets = cls_dets[keep, :]
-                all_boxes[j][i] = cls_dets
-                if vis:
-                    vis_detections(im, imdb.classes[j], cls_dets)
-
-        print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
-
     det_file = os.path.join(output_dir, 'detections.pkl')
-    with open(det_file, 'wb') as f:
-        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+
+    # Only redo inference when redo flag is set or detections file does not exist
+    if redoInference or not os.path.isfile(det_file):
+        print 'Detection files not existing OR redo parameter set --> Re-executing inference...'
+        for i in xrange(num_images):
+            im = cv2.imread(imdb.image_path_at(i))
+            det = im_detect(net, im, targe_size)
+
+            for j in xrange(1, imdb.num_classes):
+                inds = np.where(det[:, -1] == j)[0]
+                if inds.shape[0] > 0:
+                    cls_dets = det[inds, :-1].astype(np.float32)
+                    if 'coco' in imdb.name:
+                        keep = soft_nms(cls_dets, sigma=0.5, Nt=0.30, threshold=cfg.confidence_threshold, method=1)
+                        cls_dets = cls_dets[keep, :]
+                    all_boxes[j][i] = cls_dets
+                    if vis:
+                        vis_detections(im, imdb.classes[j], cls_dets)
+
+            print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
+
+        with open(det_file, 'wb') as f:
+            cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    # Else: Load dumped detections file and proceed evaluation
+    else:
+        print 'Detection files already existing --> Loading detections from file...'
+        with open(det_file, 'rb') as f:
+            all_boxes = cPickle.load(f)
 
     if imdb.name == 'voc_2012_test':
         print 'Saving detections'
@@ -247,90 +255,98 @@ def single_scale_test_net(net, imdb, targe_size=320, vis=False):
         imdb.evaluate_detections(all_boxes, output_dir)
 
 
-def multi_scale_test_net_320(net, imdb, vis=False):
+def multi_scale_test_net_320(net, imdb, vis=False, redoInference=True):
     targe_size = 320
     num_images = len(imdb.image_index)
     all_boxes = [[[] for _ in xrange(num_images)] for _ in xrange(imdb.num_classes)]
     output_dir = get_output_dir(imdb, net)
-
-    for i in xrange(num_images):
-        im = cv2.imread(imdb.image_path_at(i))
-
-        # ori and flip
-        det0 = im_detect(net, im, targe_size)
-        det0_f = flip_im_detect(net, im, targe_size)
-        det0 = np.row_stack((det0, det0_f))
-
-        det_r = im_detect_ratio(net, im, targe_size, int(0.6*targe_size))
-        det_r_f = flip_im_detect_ratio(net, im, targe_size, int(0.6*targe_size))
-        det_r = np.row_stack((det_r, det_r_f))
-
-        # shrink: only detect big object
-        det1 = im_detect(net, im, int(0.6*targe_size))
-        det1_f = flip_im_detect(net, im, int(0.6*targe_size))
-        det1 = np.row_stack((det1, det1_f))
-        index = np.where(np.maximum(det1[:, 2] - det1[:, 0] + 1, det1[:, 3] - det1[:, 1] + 1) > 32)[0]
-        det1 = det1[index, :]
-
-        #enlarge: only detect small object
-        det2 = im_detect(net, im, int(1.2*targe_size))
-        det2_f = flip_im_detect(net, im, int(1.2*targe_size))
-        det2 = np.row_stack((det2, det2_f))
-        index = np.where(np.minimum(det2[:, 2] - det2[:, 0] + 1, det2[:, 3] - det2[:, 1] + 1) < 160)[0]
-        det2 = det2[index, :]
-
-        det3 = im_detect(net, im, int(1.4*targe_size))
-        det3_f = flip_im_detect(net, im, int(1.4*targe_size))
-        det3 = np.row_stack((det3, det3_f))
-        index = np.where(np.minimum(det3[:, 2] - det3[:, 0] + 1, det3[:, 3] - det3[:, 1] + 1) < 128)[0]
-        det3 = det3[index, :]
-
-        det4 = im_detect(net, im, int(1.6*targe_size))
-        det4_f = flip_im_detect(net, im, int(1.6*targe_size))
-        det4 = np.row_stack((det4, det4_f))
-        index = np.where(np.minimum(det4[:, 2] - det4[:, 0] + 1, det4[:, 3] - det4[:, 1] + 1) < 96)[0]
-        det4 = det4[index, :]
-
-        det5 = im_detect(net, im, int(1.8*targe_size))
-        det5_f = flip_im_detect(net, im, int(1.8*targe_size))
-        det5 = np.row_stack((det5, det5_f))
-        index = np.where(np.minimum(det5[:, 2] - det5[:, 0] + 1, det5[:, 3] - det5[:, 1] + 1) < 64)[0]
-        det5 = det5[index, :]
-
-        det7 = im_detect(net, im, int(2.2*targe_size))
-        det7_f = flip_im_detect(net, im, int(2.2*targe_size))
-        det7 = np.row_stack((det7, det7_f))
-        index = np.where(np.minimum(det7[:, 2] - det7[:, 0] + 1, det7[:, 3] - det7[:, 1] + 1) < 32)[0]
-        det7 = det7[index, :]
-
-        # More scales make coco get better performance
-        if 'coco' in imdb.name:
-            det6 = im_detect(net, im, int(2.0*targe_size))
-            det6_f = flip_im_detect(net, im, int(2.0*targe_size))
-            det6 = np.row_stack((det6, det6_f))
-            index = np.where(np.minimum(det6[:, 2] - det6[:, 0] + 1, det6[:, 3] - det6[:, 1] + 1) < 48)[0]
-            det6 = det6[index, :]
-            det = np.row_stack((det0, det_r, det1, det2, det3, det4, det5, det7, det6))
-        else:
-            det = np.row_stack((det0, det_r, det1, det2, det3, det4, det5, det7))
-
-        for j in xrange(1, imdb.num_classes):
-            inds = np.where(det[:, -1] == j)[0]
-            if inds.shape[0] > 0:
-                cls_dets = det[inds, :-1].astype(np.float32)
-                if 'coco' in imdb.name:
-                    cls_dets = soft_bbox_vote(cls_dets)
-                else:
-                    cls_dets = bbox_vote(cls_dets)
-                all_boxes[j][i] = cls_dets
-                if vis:
-                    vis_detections(im, imdb.classes[j], cls_dets)
-
-        print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
-
     det_file = os.path.join(output_dir, 'detections.pkl')
-    with open(det_file, 'wb') as f:
-        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+
+    # Only redo inference when redo flag is set or detections file does not exist
+    if redoInference or not os.path.isfile(det_file):
+        print 'Detection files not existing OR redo parameter set --> Re-executing inference...'
+        for i in xrange(num_images):
+            im = cv2.imread(imdb.image_path_at(i))
+
+            # ori and flip
+            det0 = im_detect(net, im, targe_size)
+            det0_f = flip_im_detect(net, im, targe_size)
+            det0 = np.row_stack((det0, det0_f))
+
+            det_r = im_detect_ratio(net, im, targe_size, int(0.6*targe_size))
+            det_r_f = flip_im_detect_ratio(net, im, targe_size, int(0.6*targe_size))
+            det_r = np.row_stack((det_r, det_r_f))
+
+            # shrink: only detect big object
+            det1 = im_detect(net, im, int(0.6*targe_size))
+            det1_f = flip_im_detect(net, im, int(0.6*targe_size))
+            det1 = np.row_stack((det1, det1_f))
+            index = np.where(np.maximum(det1[:, 2] - det1[:, 0] + 1, det1[:, 3] - det1[:, 1] + 1) > 32)[0]
+            det1 = det1[index, :]
+
+            #enlarge: only detect small object
+            det2 = im_detect(net, im, int(1.2*targe_size))
+            det2_f = flip_im_detect(net, im, int(1.2*targe_size))
+            det2 = np.row_stack((det2, det2_f))
+            index = np.where(np.minimum(det2[:, 2] - det2[:, 0] + 1, det2[:, 3] - det2[:, 1] + 1) < 160)[0]
+            det2 = det2[index, :]
+
+            det3 = im_detect(net, im, int(1.4*targe_size))
+            det3_f = flip_im_detect(net, im, int(1.4*targe_size))
+            det3 = np.row_stack((det3, det3_f))
+            index = np.where(np.minimum(det3[:, 2] - det3[:, 0] + 1, det3[:, 3] - det3[:, 1] + 1) < 128)[0]
+            det3 = det3[index, :]
+
+            det4 = im_detect(net, im, int(1.6*targe_size))
+            det4_f = flip_im_detect(net, im, int(1.6*targe_size))
+            det4 = np.row_stack((det4, det4_f))
+            index = np.where(np.minimum(det4[:, 2] - det4[:, 0] + 1, det4[:, 3] - det4[:, 1] + 1) < 96)[0]
+            det4 = det4[index, :]
+
+            det5 = im_detect(net, im, int(1.8*targe_size))
+            det5_f = flip_im_detect(net, im, int(1.8*targe_size))
+            det5 = np.row_stack((det5, det5_f))
+            index = np.where(np.minimum(det5[:, 2] - det5[:, 0] + 1, det5[:, 3] - det5[:, 1] + 1) < 64)[0]
+            det5 = det5[index, :]
+
+            det7 = im_detect(net, im, int(2.2*targe_size))
+            det7_f = flip_im_detect(net, im, int(2.2*targe_size))
+            det7 = np.row_stack((det7, det7_f))
+            index = np.where(np.minimum(det7[:, 2] - det7[:, 0] + 1, det7[:, 3] - det7[:, 1] + 1) < 32)[0]
+            det7 = det7[index, :]
+
+            # More scales make coco get better performance
+            if 'coco' in imdb.name:
+                det6 = im_detect(net, im, int(2.0*targe_size))
+                det6_f = flip_im_detect(net, im, int(2.0*targe_size))
+                det6 = np.row_stack((det6, det6_f))
+                index = np.where(np.minimum(det6[:, 2] - det6[:, 0] + 1, det6[:, 3] - det6[:, 1] + 1) < 48)[0]
+                det6 = det6[index, :]
+                det = np.row_stack((det0, det_r, det1, det2, det3, det4, det5, det7, det6))
+            else:
+                det = np.row_stack((det0, det_r, det1, det2, det3, det4, det5, det7))
+
+            for j in xrange(1, imdb.num_classes):
+                inds = np.where(det[:, -1] == j)[0]
+                if inds.shape[0] > 0:
+                    cls_dets = det[inds, :-1].astype(np.float32)
+                    if 'coco' in imdb.name:
+                        cls_dets = soft_bbox_vote(cls_dets)
+                    else:
+                        cls_dets = bbox_vote(cls_dets)
+                    all_boxes[j][i] = cls_dets
+                    if vis:
+                        vis_detections(im, imdb.classes[j], cls_dets)
+
+            print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
+
+        with open(det_file, 'wb') as f:
+            cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    # Else: Load dumped detections file and proceed evaluation
+    else:
+        print 'Detection files already existing --> Loading detections from file...'
+        with open(det_file, 'rb') as f:
+            all_boxes = cPickle.load(f)
 
     if imdb.name == 'voc_2012_test':
         print 'Saving detections'
@@ -341,86 +357,94 @@ def multi_scale_test_net_320(net, imdb, vis=False):
         imdb.evaluate_detections(all_boxes, output_dir)
 
 
-def multi_scale_test_net_512(net, imdb, vis=False):
+def multi_scale_test_net_512(net, imdb, vis=False, redoInference=True):
     targe_size = 512
     num_images = len(imdb.image_index)
     all_boxes = [[[] for _ in xrange(num_images)] for _ in xrange(imdb.num_classes)]
     output_dir = get_output_dir(imdb, net)
-
-    for i in xrange(num_images):
-        im = cv2.imread(imdb.image_path_at(i))
-
-        # ori and flip
-        det0 = im_detect(net, im, targe_size)
-        det0_f = flip_im_detect(net, im, targe_size)
-        det0 = np.row_stack((det0, det0_f))
-
-        det_r = im_detect_ratio(net, im, targe_size, int(0.75*targe_size))
-        det_r_f = flip_im_detect_ratio(net, im, targe_size, int(0.75*targe_size))
-        det_r = np.row_stack((det_r, det_r_f))
-
-        # shrink: only detect big object
-        det_s1 = im_detect(net, im, int(0.5*targe_size))
-        det_s1_f = flip_im_detect(net, im, int(0.5*targe_size))
-        det_s1 = np.row_stack((det_s1, det_s1_f))
-
-        det_s2 = im_detect(net, im, int(0.75*targe_size))
-        det_s2_f = flip_im_detect(net, im, int(0.75*targe_size))
-        det_s2 = np.row_stack((det_s2, det_s2_f))
-
-        # #enlarge: only detect small object
-        det3 = im_detect(net, im, int(1.75*targe_size))
-        det3_f = flip_im_detect(net, im, int(1.75*targe_size))
-        det3 = np.row_stack((det3, det3_f))
-        index = np.where(np.minimum(det3[:, 2] - det3[:, 0] + 1, det3[:, 3] - det3[:, 1] + 1) < 128)[0]
-        det3 = det3[index, :]
-
-        det4 = im_detect(net, im, int(1.5*targe_size))
-        det4_f = flip_im_detect(net, im, int(1.5*targe_size))
-        det4 = np.row_stack((det4, det4_f))
-        index = np.where(np.minimum(det4[:, 2] - det4[:, 0] + 1, det4[:, 3] - det4[:, 1] + 1) < 192)[0]
-        det4 = det4[index, :]
-
-        # More scales make coco get better performance
-        if 'coco' in imdb.name:
-            det5 = im_detect(net, im, int(1.25*targe_size))
-            det5_f = flip_im_detect(net, im, int(1.25*targe_size))
-            det5 = np.row_stack((det5, det5_f))
-            index = np.where(np.minimum(det5[:, 2] - det5[:, 0] + 1, det5[:, 3] - det5[:, 1] + 1) < 224)[0]
-            det5 = det5[index, :]
-
-            det6 = im_detect(net, im, int(2*targe_size))
-            det6_f = flip_im_detect(net, im, int(2*targe_size))
-            det6 = np.row_stack((det6, det6_f))
-            index = np.where(np.minimum(det6[:, 2] - det6[:, 0] + 1, det6[:, 3] - det6[:, 1] + 1) < 96)[0]
-            det6 = det6[index, :]
-
-            det7 = im_detect(net, im, int(2.25*targe_size))
-            det7_f = flip_im_detect(net, im, int(2.25*targe_size))
-            det7 = np.row_stack((det7, det7_f))
-            index = np.where(np.minimum(det7[:, 2] - det7[:, 0] + 1, det7[:, 3] - det7[:, 1] + 1) < 64)[0]
-            det7 = det7[index, :]
-            det = np.row_stack((det0, det_r, det_s1, det_s2, det3, det4, det5, det6, det7))
-        else:
-            det = np.row_stack((det0, det_r, det_s1, det_s2, det3, det4))
-
-        for j in xrange(1, imdb.num_classes):
-            inds = np.where(det[:, -1] == j)[0]
-            if inds.shape[0] > 0:
-                cls_dets = det[inds, :-1].astype(np.float32)
-                if 'coco' in imdb.name:
-                    cls_dets = soft_bbox_vote(cls_dets)
-                else:
-                    cls_dets = bbox_vote(cls_dets)
-                all_boxes[j][i] = cls_dets
-                if vis:
-                    vis_detections(im, imdb.classes[j], cls_dets)
-
-        print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
-
     det_file = os.path.join(output_dir, 'detections.pkl')
-    with open(det_file, 'wb') as f:
-        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+
+    # Only redo inference when redo flag is set or detections file does not exist
+    if redoInference or not os.path.isfile(det_file):
+        print 'Detection files not existing OR redo parameter set --> Re-executing inference...'
+        for i in xrange(num_images):
+            im = cv2.imread(imdb.image_path_at(i))
+
+            # ori and flip
+            det0 = im_detect(net, im, targe_size)
+            det0_f = flip_im_detect(net, im, targe_size)
+            det0 = np.row_stack((det0, det0_f))
+
+            det_r = im_detect_ratio(net, im, targe_size, int(0.75*targe_size))
+            det_r_f = flip_im_detect_ratio(net, im, targe_size, int(0.75*targe_size))
+            det_r = np.row_stack((det_r, det_r_f))
+
+            # shrink: only detect big object
+            det_s1 = im_detect(net, im, int(0.5*targe_size))
+            det_s1_f = flip_im_detect(net, im, int(0.5*targe_size))
+            det_s1 = np.row_stack((det_s1, det_s1_f))
+
+            det_s2 = im_detect(net, im, int(0.75*targe_size))
+            det_s2_f = flip_im_detect(net, im, int(0.75*targe_size))
+            det_s2 = np.row_stack((det_s2, det_s2_f))
+
+            # #enlarge: only detect small object
+            det3 = im_detect(net, im, int(1.75*targe_size))
+            det3_f = flip_im_detect(net, im, int(1.75*targe_size))
+            det3 = np.row_stack((det3, det3_f))
+            index = np.where(np.minimum(det3[:, 2] - det3[:, 0] + 1, det3[:, 3] - det3[:, 1] + 1) < 128)[0]
+            det3 = det3[index, :]
+
+            det4 = im_detect(net, im, int(1.5*targe_size))
+            det4_f = flip_im_detect(net, im, int(1.5*targe_size))
+            det4 = np.row_stack((det4, det4_f))
+            index = np.where(np.minimum(det4[:, 2] - det4[:, 0] + 1, det4[:, 3] - det4[:, 1] + 1) < 192)[0]
+            det4 = det4[index, :]
+
+            # More scales make coco get better performance
+            if 'coco' in imdb.name:
+                det5 = im_detect(net, im, int(1.25*targe_size))
+                det5_f = flip_im_detect(net, im, int(1.25*targe_size))
+                det5 = np.row_stack((det5, det5_f))
+                index = np.where(np.minimum(det5[:, 2] - det5[:, 0] + 1, det5[:, 3] - det5[:, 1] + 1) < 224)[0]
+                det5 = det5[index, :]
+
+                det6 = im_detect(net, im, int(2*targe_size))
+                det6_f = flip_im_detect(net, im, int(2*targe_size))
+                det6 = np.row_stack((det6, det6_f))
+                index = np.where(np.minimum(det6[:, 2] - det6[:, 0] + 1, det6[:, 3] - det6[:, 1] + 1) < 96)[0]
+                det6 = det6[index, :]
+
+                det7 = im_detect(net, im, int(2.25*targe_size))
+                det7_f = flip_im_detect(net, im, int(2.25*targe_size))
+                det7 = np.row_stack((det7, det7_f))
+                index = np.where(np.minimum(det7[:, 2] - det7[:, 0] + 1, det7[:, 3] - det7[:, 1] + 1) < 64)[0]
+                det7 = det7[index, :]
+                det = np.row_stack((det0, det_r, det_s1, det_s2, det3, det4, det5, det6, det7))
+            else:
+                det = np.row_stack((det0, det_r, det_s1, det_s2, det3, det4))
+
+            for j in xrange(1, imdb.num_classes):
+                inds = np.where(det[:, -1] == j)[0]
+                if inds.shape[0] > 0:
+                    cls_dets = det[inds, :-1].astype(np.float32)
+                    if 'coco' in imdb.name:
+                        cls_dets = soft_bbox_vote(cls_dets)
+                    else:
+                        cls_dets = bbox_vote(cls_dets)
+                    all_boxes[j][i] = cls_dets
+                    if vis:
+                        vis_detections(im, imdb.classes[j], cls_dets)
+
+            print 'im_detect: {:d}/{:d}'.format(i + 1, num_images)
+
+        with open(det_file, 'wb') as f:
+            cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    # Else: Load dumped detections file and proceed evaluation
+    else:
+        print 'Detection files already existing --> Loading detections from file...'
+        with open(det_file, 'rb') as f:
+            all_boxes = cPickle.load(f)
 
     if imdb.name == 'voc_2012_test':
         print 'Saving detections'

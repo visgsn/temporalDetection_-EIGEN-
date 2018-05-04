@@ -23,6 +23,7 @@ if __name__ == '__main__':
     atWork  = True  # Change this in "factory.py", too!
 
     doMatlabEval    = True  # If True: Use additional MATLAB test evaluation (on "test-all")
+    redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
     job_name        = "refinedet_vgg16_320x320"  # DEFAULT: "refinedet_vgg16_320x320"
@@ -91,12 +92,12 @@ if __name__ == '__main__':
         except:
             iter = 000000
         if single_scale is True:
-            single_scale_test_net(net, imdb, targe_size=input_size, vis=visualizeDets)
+            single_scale_test_net(net, imdb, targe_size=input_size, vis=visualizeDets, redoInference=redoInference)
         else:
             if input_size == 320:
-                multi_scale_test_net_320(net, imdb, vis=visualizeDets)
+                multi_scale_test_net_320(net, imdb, vis=visualizeDets, redoInference=redoInference)
             else:
-                multi_scale_test_net_512(net, imdb, vis=visualizeDets)
+                multi_scale_test_net_512(net, imdb, vis=visualizeDets, redoInference=redoInference)
         mAP[iter]   = cfg.mAP
         mPrec[iter] = cfg.prec
         mRec[iter]  = cfg.rec
