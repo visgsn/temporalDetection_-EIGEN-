@@ -50,7 +50,8 @@ roc=[scoreROC fp tp];
 % Plot results
 f = figure(show);
 plotRoc([fp tp],'logx',1,'logy',1,'xLbl','False positives per image',...
-  'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref);
+  'lims',lims,'color',clr,'lineSt', lineSt,'smooth',1,'fpTarget',ref,...
+  'lineWd',2);
 title(sprintf('log-average miss rate = %.2f%%',laMiss * 100));
 % Save figure and image of figure
 savefig([name type '_ROC' '.fig']);
@@ -64,13 +65,14 @@ close(f);  % Close old figure
 f = figure(show);
 f.Position(3) = f.Position(3) * 2;  % Double figure width
 subplot(1,2,1);
-plot(fp, tp, 'b', 'LineWidth', 4);
+plot(fp, tp, 'b', 'LineWidth', 2);
 grid on;
 title("true / false positives per image");
 xlabel("FPPI [1 / image]"); ylabel("TPPI [1 / image]");
 % TP and FP over score
 subplot(1,2,2);
-plot(scoreROC, tp, 'g', scoreROC, fp, 'r', 'LineWidth', 4);
+plot(scoreROC, tp, 'g', scoreROC, fp, 'r', 'LineWidth', 2);
+axis([0 100 0 min(3, max(max(fp), max(tp)))]);
 grid on;
 legend("TPPI", "FPPI");
 title("true / false positives per image w.r.t. score");
@@ -90,13 +92,13 @@ pr=[scorePR rec prec];
 f = figure(show);
 f.Position(3) = f.Position(3) * 2;  % Double figure width
 subplot(1,2,1);
-plot(rec * 100, prec * 100, 'b', 'LineWidth', 4);
+plot(rec * 100, prec * 100, 'b', 'LineWidth', 2);
 axis([0 100 0 100]); grid on;
 title("precision and recall");
 xlabel("recall [%]"); ylabel("precision [%]");
 % Precision and recall over score
 subplot(1,2,2);
-plot(scorePR, prec * 100, 'g', scorePR, rec * 100, 'b', 'LineWidth', 4);
+plot(scorePR, prec * 100, 'g', scorePR, rec * 100, 'b', 'LineWidth', 2);
 axis([0 100 0 100]); grid on;
 legend("precision", "recall");
 title("precision / recall w.r.t. score");
