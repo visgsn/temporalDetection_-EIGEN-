@@ -679,6 +679,7 @@ function [hs,hImg] = showRes( I, gt, dt, varargin )
 %   .evShow     - [1] if true show results of evaluation
 %   .gtShow     - [1] if true show ground truth
 %   .dtShow     - [1] if true show detections
+%   .thrShow    - [1] show only dts with score above thrShow (1 ... 100)
 %   .cols       - ['krg'] colors for ignore/mistake/correct
 %   .gtLs       - ['-'] line style for gt bbs
 %   .dtLs       - ['--'] line style for dt bbs
@@ -691,9 +692,9 @@ function [hs,hImg] = showRes( I, gt, dt, varargin )
 % EXAMPLE
 %
 % See also bbGt, bbGt>evalRes
-dfs={'evShow',1,'gtShow',1,'dtShow',1,'cols','krg',...
-  'gtLs','-','dtLs','--','lw',1};  % Standard: lw = 3
-[evShow,gtShow,dtShow,cols,gtLs,dtLs,lw]=getPrmDflt(varargin,dfs,1);
+dfs={'evShow',1, 'gtShow',1, 'dtShow',1, 'thrShow',1, 'cols','krg',...
+  'gtLs','-', 'dtLs','--', 'lw',1};  % Standard: lw = 3
+[evShow,gtShow,dtShow,thrShow,cols,gtLs,dtLs,lw]=getPrmDflt(varargin,dfs,1);
 % optionally display image
 if(ischar(I)), I=imread(I); end
 if(~isempty(I)), hImg=im(I,[],0); title(''); end
@@ -702,8 +703,8 @@ hold on; hs=cell(1,1000); k=0;
 if( evShow )
   if(gtShow), for i=1:size(gt,1), k=k+1;
       hs{k}=bbApply('draw',gt(i,1:4),cols(gt(i,5)+2),lw,gtLs); end; end
-  if(dtShow), for i=1:size(dt,1), k=k+1;
-      hs{k}=bbApply('draw',dt(i,1:5),cols(dt(i,6)+2),lw,dtLs); end; end
+  if(dtShow), for i=1:size(dt,1), if(dt(i,5)>=thrShow), k=k+1;
+      hs{k}=bbApply('draw',dt(i,1:5),cols(dt(i,6)+2),lw,dtLs); end;end;end
 else
   if(gtShow), k=k+1; hs{k}=bbApply('draw',gt(:,1:4),cols(3),lw,gtLs); end
   if(dtShow), k=k+1; hs{k}=bbApply('draw',dt(:,1:5),cols(3),lw,dtLs); end

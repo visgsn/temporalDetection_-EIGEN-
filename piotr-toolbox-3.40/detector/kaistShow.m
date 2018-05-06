@@ -2,15 +2,16 @@ function [hs, hImg] = kaistShow( varargin )
 % Test aggregate channel features object detector given ground truth.
 %
 % USAGE
-%  [miss,roc,gt,dt] = kaistTest( pTest )
+%  [miss,roc,gt,dt] = kaistShow( pShow )
 %
 % INPUTS
-%  pTest    - parameters (struct or name/value pairs)
+%  pShow    - parameters (struct or name/value pairs)
 %   .name     - ['REQ'] detector name
 %   .gtDir    - ['REQ'] dir containing test ground truth
 %   .bbsNm    - ['REQ'] file containing detections (.txt format)
 %   .pLoad    - [] params for bbGt>bbLoad for test data (see bbGt>bbLoad)
 %   .thr      - [.5] threshold on overlap area for comparing two bbs
+%   .thrShow  - [1] show only dts with score above thrShow (1 ... 100)
 %   .mul      - [0] if true allow multiple matches to each gt
 %   .ref      - [10.^(-2:.25:0)] reference points (see bbGt>compRoc)
 %   .lims     - [3.1e-3 1e1 .05 1] plot axis limits
@@ -28,11 +29,12 @@ function [hs, hImg] = kaistShow( varargin )
 
 % get parameters
 dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'imgNms','REQ', ...
-    'pLoad',[], 'thr',.5, 'mul',0, 'ref',10.^(-2:.25:0), ...
+    'pLoad',[], 'thr',.5, 'thrShow',1, 'mul',0, 'ref',10.^(-2:.25:0), ...
     'lims',[3.1e-3 1e1 .05 1], 'show',1, 'type','', 'clr','g', ...
     'lineSt','-' };
-[name,gtDir,bbsNm,imgNms,pLoad,thr,mul,ref,lims,show,type,clr,lineSt] = ...
-  getPrmDflt(varargin,dfs,1);
+[name,gtDir,bbsNm,imgNms,pLoad,thr,thrShow,...
+    mul,ref,lims,show,type,clr,lineSt] ...
+    = getPrmDflt(varargin,dfs,1);
 
 % Open figure and display buttons for user interaction (window control)
 figure();
@@ -58,7 +60,7 @@ while imgCount <= length(imgNms)
     img = imread(imgNms{imgCount});
     grtr = gt{imgCount};
     det = dt{imgCount};
-    [hs,hImg] = bbGt( 'showRes', img, grtr, det);
+    [hs,hImg] = bbGt( 'showRes', img, grtr, det, 'thrShow',thrShow);
     
     % print current array index and image name
     fprintf(...

@@ -9,11 +9,12 @@
 % Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
 atWork = true;
 
-iterToTest     = '50184';  % Specify which solver iteration Nr. to test
+iterToTest     = '40000';  % Specify which solver iteration Nr. to test
+thrShow        = 45;  % Set confidence threshold for showing detections
 
 subsetName     = 'train-all-T';
-job_name       = 'refinedet_it50184_320x320';  % DEFAULT: 'refinedet_vgg16_320x320'
-experimentName = 'testing';  % Name of evalOutput subfolder (experiment name)
+job_name       = 'refinedet_50home_320x320';  % DEFAULT: 'refinedet_vgg16_320x320'
+experimentName = 'singleScale';  % Name of evalOutput subfolder (experiment name)
 
 % Path prefix for output directory
 path_prefix_HOME = sprintf('%s/train_test_data', getenv('HOME'));
@@ -64,4 +65,4 @@ addpath( genpath( piotrToolboxPath ) );
 
 
 %% Call function to show results
-evalKAIST(inOutDir, dataDir, bbsNmFile, 1)
+evalKAIST(inOutDir, dataDir, bbsNmFile, 1, 'thrShow',thrShow)
