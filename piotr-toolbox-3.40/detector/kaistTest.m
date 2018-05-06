@@ -38,7 +38,7 @@ dfs={ 'name','REQ', 'gtDir','REQ', 'bbsNm','REQ', 'pLoad',[], ...
   getPrmDflt(varargin,dfs,1);
 
 %% run evaluation using bbGt
-[gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);
+[gt,dt] = bbGt('loadAll',gtDir,bbsNm,pLoad);  % gt := gt0, dt := dt0
 [gt,dt] = bbGt('evalRes',gt,dt,thr,mul);
 
 
@@ -67,16 +67,16 @@ f.Position(3) = f.Position(3) * 2;  % Double figure width
 subplot(1,2,1);
 plot(fp, tp, 'b', 'LineWidth', 2);
 grid on;
-title("true / false positives per image");
-xlabel("FPPI [1 / image]"); ylabel("TPPI [1 / image]");
+title("true positives / false positives per image");
+xlabel("FPPI [1 / image]"); ylabel("TP_{norm}");
 % TP and FP over score
 subplot(1,2,2);
 plot(scoreROC, tp, 'g', scoreROC, fp, 'r', 'LineWidth', 2);
 axis([0 100 0 min(3, max(max(fp), max(tp)))]);
 grid on;
-legend("TPPI", "FPPI");
-title("true / false positives per image w.r.t. score");
-xlabel("score [%]"); ylabel("[1 / image]");
+legend("TP_{norm}", "FPPI [1 / image]");
+title("true / false positives w.r.t. score");
+xlabel("score [%]"); %ylabel("[1 / image]");
 % Save figure and image of figure
 savefig([name type '_ROC-TP-FP' '.fig']);
 frame=getframe(f);
