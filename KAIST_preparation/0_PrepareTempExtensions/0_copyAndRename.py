@@ -9,12 +9,13 @@
         set00_V000_I00019_train-all.txt
 '''
 
-from _usefulFunctions import *
 import shutil
 import os
 import sys
 import re
 import logging
+sys.path.append( os.path.abspath(os.path.join(os.path.curdir, "..")) )  # Added to enable import from parent directory
+from _usefulFunctions import *
 
 ##### Configurations ###################################################################################################
 atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
