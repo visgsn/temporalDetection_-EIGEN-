@@ -1,12 +1,12 @@
 '''
     This script is used to copy and rename the images and annotations from the KAIST dataset, which have previously
-    been extracted with Pjotr's Matlab Toolbox. (By default only training data from set00 to set05)
+    been extracted with Pjotr's Matlab Toolbox. (By default only training data from set06 to set11)
     Names are chosen according to the scheme of "train_all20" with one exception - instead of the unique ID at the
     end of the generated file names, the last element of 'outputDir' is used as postfix (e.g. _train-all).
     Example for images:
-        T_tmp_set00_V000_I00019_train-all.png         (T_ stands for "thermal", RGB_ for color images)
+        T_tmp_set06_V000_I00019_test-all-T.png         (T_ stands for "thermal", RGB_ for color images)
     Example for annotations:
-        set00_V000_I00019_train-all.txt
+        set06_V000_I00019_test-all-T.txt
 '''
 
 import shutil
@@ -29,7 +29,7 @@ extractRgb      = False             # If true, RGB images will be extracted into
 
 annoRegex       = '.*.txt$'         # Used to find available annotations
 imageRegex      = 'frame_.*.png$'   # Used to find available images
-extractSetRegex = '.*\/set0[6-11]\/' # Specifies which sets to extract (Default: '.*\/set0[0-5]\/')
+extractSetRegex = '.*\/set(0[6-9]|1[0-1])\/' # Specifies which sets to extract (Default: '.*\/set0[0-5]\/')
 splitThermRegex = '.*\/LWIR_V'      # Used to separate RGB- and thermal images
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
