@@ -1,8 +1,8 @@
 '''
     This script is used to copy and rename the images and annotations from the KAIST dataset, which have previously
-    been extracted with Pjotr's Matlab Toolbox. (By default only training data from set06 to set11)
+    been extracted with Pjotr's Matlab Toolbox. (By default only testing data from set06 to set11)
     Names are chosen according to the scheme of "train_all20" with one exception - instead of the unique ID at the
-    end of the generated file names, the last element of 'outputDir' is used as postfix (e.g. _train-all).
+    end of the generated file names, the last element of 'outputDir' is used as postfix (e.g. _test-all-T).
     Example for images:
         T_tmp_set06_V000_I00019_test-all-T.png         (T_ stands for "thermal", RGB_ for color images)
     Example for annotations:
