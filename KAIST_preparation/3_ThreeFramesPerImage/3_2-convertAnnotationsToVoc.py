@@ -18,12 +18,12 @@ from _usefulFunctions import *
 ##### Configurations ###################################################################################################
 atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
+dataToExtract   = ['3_train-all-T_D4', '3_test-all-T_D4']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
+excludeLabels   = ['people', 'person?', 'cyclist']
+useThermal      = True  # If False, 'RGB_'-images will be extracted. (Do not change this!)
+
 kaistFolderHOME = '/home/gueste/data/KAIST/data-kaist'
 kaistFolderWORK = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
-
-dataToExtract   = ['train-all-T', 'test-all']   # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
-excludeLabels   = ['people', 'person?', 'cyclist']
-useThermal      = True  # If False, 'RGB_'-images will be extracted.
 
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
