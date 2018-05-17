@@ -11,6 +11,8 @@ import os
 import sys
 import logging
 import shutil
+import numpy as np
+import cv2
 sys.path.append( os.path.abspath(os.path.join(os.path.curdir, "..")) )  # Added to enable import from parent directory
 from _usefulFunctions import *
 
@@ -31,7 +33,7 @@ mainTestSet     = 'test-all'  # Main test set for comparison (Do not change this
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
-dataToExtract   = ['test-all-T', 'train-all-T']                                                                         # Wieder entfernen!!!
+#dataToExtract   = ['test-all-T', 'train-all-T']                                                                         # Wieder entfernen!!!
 
 kaistDir = kaistDirWORK[:] if atWORK else kaistDirHOME[:]
 assert os.path.exists(kaistDir), \
@@ -69,48 +71,70 @@ for folder in dataToExtract:
     annoDir_in  = os.path.join(inputDir, 'annotations')
     imageDir_in = os.path.join(inputDir, 'images')
 
-    annoFiles = dirRecursive(annoDir_in, '.*.txt$')
+    annoFiles_in = dirRecursive(annoDir_in, '.*.txt$')
     if useThermal:
-        imgFiles = dirRecursive(imageDir_in, 'T_.*.png$')   # "T_" --> Thermal imag.
+        imgFiles_in = dirRecursive(imageDir_in, 'T_.*.png$')   # "T_" --> Thermal imag.
     else:
-        imgFiles = dirRecursive(imageDir_in, 'RGB_.*.png$') # "RGB_" --> Colored imag.
+        imgFiles_in = dirRecursive(imageDir_in, 'RGB_.*.png$') # "RGB_" --> Colored imag.
 
     # Check for equal number of images and annotations
-    assert len(annoFiles) == len(imgFiles), \
+    assert len(annoFiles_in) == len(imgFiles_in), \
         "Number of annotations not equal to number of images!"
 
     # Test data --> Copy only files that also exist in official the mainTestSet, afterwards fuse them as desired
+    annoFiles_out   = []
+    imgFiles_out    = []
+    imgIndex_out    = []  # Denotes the position of an image in the original imgFiles_in array
     if 'test' in folder:
         logging.info("Copying TEST data from '{}' to '{}'".format(inputDir, outputDir))
-        tmpAnno     = []
-        tmpImg      = []
         foundFlag   = False
-        lastIter    = 0  # Used to speed up search
+        nextIter    = 0  # Used to speed up search
         for name in mainAnnoFiles:
-            for i in range(lastIter, len(annoFiles)):
-                if name in os.path.split(annoFiles[i])[1]:
-                    tmpAnno.append(annoFiles[i])
-                    tmpImg.append(imgFiles[i])
+            for i in range(nextIter, len(annoFiles_in)):
+                if name in os.path.split(annoFiles_in[i])[1] and name in os.path.split(imgFiles_in[i])[1]:
+                    annoFiles_out.append(annoFiles_in[i])
+                    imgFiles_out.append(imgFiles_in[i])
+                    imgIndex_out.append(i)
                     foundFlag = True  # Set flag -> corresponding annotation / image pair found
-                    lastIter = i
+                    nextIter = i + 1
                     break
             # Check if pair found
             assert foundFlag == True, "No corresponding anno / img pait found for '{}'".format(name)
             foundFlag = False  # Reset flag
-        annoFiles   = tmpAnno[:]
-        imgFiles    = tmpImg[:]
 
     # Train data --> Copy all files and fuse them as desired
     else:
         logging.info("Copying TRAIN data from '{}' to '{}'".format(inputDir, outputDir))
+        annoFiles_out   = annoFiles_in[:]
+        imgFiles_out    = imgFiles_in[:]
+        imgIndex_out    = range(len(imgFiles_in))
 
-    ### Determine images which have to be combined (fused) to one single image in RGB format
-    
+    ### Determine predecessors of images which have to be combined (fused) to one single image in RGB format
+    for i, singleImg in enumerate(imgFiles_out):
+        tmpImgFiles = [singleImg, '', '']  # Stores original image path and its 2 predecessors
+        for predNr in range(1,3):
+            predIndex = imgIndex_out[i] - (predNr * imageStepSize)
+            if predIndex < 0:
+                # Set same predecessor as before (image content NOT temporally connected or index out of range)
+                tmpImgFiles[predNr] = tmpImgFiles[predNr-1]
+            else:
+                # Determine filenames for comparison of setXX_VXXX
+                _,origName,_ = fileParts(singleImg)
+                _,predName,_ = fileParts(imgFiles_in[predIndex])
 
-    ### Copy and fused images
+                # Set calculated predecessor (image content temporally connected)
+                tmpImgFiles[predNr] = imgFiles_in[predIndex]
+
+    img = cv2.imread('/home/gueste/Schreibtisch/T_tmp_set06_V004_I00800_test-all-T (Kopie).png')
+    im_r = img[:, :, 2]
+    im_g = img[:, :, 1]
+    im_b = img[:, :, 0]
+    cv2.imwrite('/home/gueste/Schreibtisch/T_tmp_set06_V004_I00800_test-all-T (neu).png', img)
+
+    ### Copy annotations and save fused images
     # Annotations
-    for singleAnno in annoFiles:
+    for singleAnno in annoFiles_out:
         shutil.copy(singleAnno, annoDir_out)
     # Images
-    for singleImg in imgFiles:
+    for singleImg in imgFiles_out:
         shutil.copy(singleImg, imageDir_out)
