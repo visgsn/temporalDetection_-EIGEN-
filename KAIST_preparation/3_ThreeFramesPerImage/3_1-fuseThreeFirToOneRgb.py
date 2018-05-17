@@ -20,22 +20,22 @@ from _usefulFunctions import *
 
 
 ##### Configurations ###################################################################################################
-atWORK          = False  # Choose which config to use: HOME (False) - WORK (True)
+atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
 dataToExtract   = ['train-all-T', 'test-all-T']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
-imageStepSize   = 5  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS)
+imageStepSize   = 4  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS)
 
 kaistDirHOME    = '/home/gueste/data/KAIST/data-kaist'
 kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
 
 mainTestSet     = 'test-all'  # Main test set for comparison (Do not change this for KAIST dataset!)
-useThermal      = True  # If False, 'RGB_'-images will be extracted.
+useThermal      = True  # If False, 'RGB_'-images will be extracted. (Do not change!)
 
 set_V_Pattern   = '(set[0-9]+_V[0-9]+)_'  # Used for comparison of predecessor image names with original image
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
-dataToExtract   = ['test-all-T', 'train-all-T']                                                                         # Wieder entfernen!!!
+
 
 kaistDir = kaistDirWORK[:] if atWORK else kaistDirHOME[:]
 assert os.path.exists(kaistDir), \
@@ -133,6 +133,9 @@ for folder in dataToExtract:
         imgFiles_out[i] = tmpImgFiles[:]
 
     ### Fuse and save images
+    logging.info("Fusing and saving images for '{}'".format(folder))
+    progressTenPercent = len(imgFiles_out) / 10  # Used to display progress while copying
+    currentProgress = 0
     for i in range(0, len(imgFiles_out)):
         # Load original image (BGR-Format: BGR --> 012)
         imgOrig = cv2.imread(imgFiles_out[i][0])
@@ -144,7 +147,20 @@ for folder in dataToExtract:
         outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
         cv2.imwrite(outputFileName, imgOrig)
 
+        # Print progress status
+        if 0 == i % progressTenPercent:
+            logging.info(str(currentProgress) + "% complete")
+            currentProgress += 10
+
     ### Copy annotations
-    # Annotations
-    for singleAnno in annoFiles_out:
+    logging.info("Copying annotations for '{}'".format(folder))
+    progressTenPercent = len(annoFiles_out) / 10  # Used to display progress while copying
+    currentProgress = 0
+    # Copy annotations
+    for i, singleAnno in enumerate(annoFiles_out):
         shutil.copy(singleAnno, annoDir_out)
+
+        # Print progress status
+        if 0 == i % progressTenPercent:
+            logging.info(str(currentProgress) + "% complete")
+            currentProgress += 10
