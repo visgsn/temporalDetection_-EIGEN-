@@ -1,10 +1,12 @@
 '''
-    This script converts all annotations from the KAIST dataset to a compatible format for VOC
-    and exports them as .xml files into the output folder (renamed according to image name).
-
-    Afterwards you can run "generateVocLists.py"
-
-    Check paths below before execution!
+    This script is used to copy and fuse the FIR images and annotations from the KAIST dataset, which has previously
+    been prepared with 0_copyAndRename.py.
+    
+    Fused images consist of three image frames, collected from three different time steps.
+    This way it is possible to provide temporal information within one RGB image.
+    
+    Names of the output folders are chosen according to the following scheme:
+        '3_<dataToExtract>_D<imageStepSize>', e.g. '3_test-all-T_D4'
 '''
 
 import os
