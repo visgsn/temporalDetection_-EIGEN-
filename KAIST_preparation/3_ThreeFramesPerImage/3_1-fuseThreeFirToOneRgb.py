@@ -13,6 +13,7 @@ import logging
 import shutil
 import numpy as np
 import cv2
+import re
 sys.path.append( os.path.abspath(os.path.join(os.path.curdir, "..")) )  # Added to enable import from parent directory
 from _usefulFunctions import *
 
@@ -30,6 +31,7 @@ kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/dat
 
 mainTestSet     = 'test-all'  # Main test set for comparison (Do not change this for KAIST dataset!)
 
+set_V_Pattern   = '(set[0-9]+_V[0-9]+)_'  # Used for comparison of predecessor image names with original image
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
@@ -114,16 +116,21 @@ for folder in dataToExtract:
         tmpImgFiles = [singleImg, '', '']  # Stores original image path and its 2 predecessors
         for predNr in range(1,3):
             predIndex = imgIndex_out[i] - (predNr * imageStepSize)
-            if predIndex < 0:
-                # Set same predecessor as before (image content NOT temporally connected or index out of range)
-                tmpImgFiles[predNr] = tmpImgFiles[predNr-1]
-            else:
+            if predIndex >= 0:
                 # Determine filenames for comparison of setXX_VXXX
                 _,origName,_ = fileParts(singleImg)
                 _,predName,_ = fileParts(imgFiles_in[predIndex])
+                origSetV = re.search(set_V_Pattern, origName).group(1)
+                predSetV = re.search(set_V_Pattern, predName).group(1)
+                if origSetV == predSetV:
+                    # Set calculated predecessor (image content temporally connected) and continue with next iteration
+                    tmpImgFiles[predNr] = imgFiles_in[predIndex]
+                    continue
+            # Set same predecessor as before (image content NOT temporally connected or index out of range)
+            tmpImgFiles[predNr] = tmpImgFiles[predNr-1]
 
-                # Set calculated predecessor (image content temporally connected)
-                tmpImgFiles[predNr] = imgFiles_in[predIndex]
+        # Assign predecessors behind original image
+        imgFiles_out[i] = tmpImgFiles[:]
 
     img = cv2.imread('/home/gueste/Schreibtisch/T_tmp_set06_V004_I00800_test-all-T (Kopie).png')
     im_r = img[:, :, 2]
@@ -136,5 +143,5 @@ for folder in dataToExtract:
     for singleAnno in annoFiles_out:
         shutil.copy(singleAnno, annoDir_out)
     # Images
-    for singleImg in imgFiles_out:
+    for singleImg in imgFiles_out[:][1]:
         shutil.copy(singleImg, imageDir_out)
