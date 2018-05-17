@@ -16,7 +16,7 @@ import shutil
 import numpy as np
 import cv2
 import re
-sys.path.append( os.path.abspath(os.path.join(os.path.curdir, "..")) )  # Added to enable import from parent directory
+sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) )  # Enable import from parent directory
 from _usefulFunctions import *
 
 
