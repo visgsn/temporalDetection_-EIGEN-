@@ -33,7 +33,7 @@ remove_old_models = False
 
 max_iter_train  = 20000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
 snapshot_train  = 500  # Number of iterations to take a snapshot
-base_lr_train   = 0.002  # Learning rate to start with (ORIGINAL: 0.0005)
+base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = True  # If true: Use dropout for training
 useResize512    = True  # False: 320x320   True: 512x512
 
@@ -43,7 +43,7 @@ batch_size_WORK     = 10
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 180  # Must be a multiple of batch_size
 
-job_name_template = "Tr13_i20k_lr002_bs180_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "Tr13_NEW_i20k_lr002_bs180_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
