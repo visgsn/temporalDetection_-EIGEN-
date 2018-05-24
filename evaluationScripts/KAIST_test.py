@@ -77,7 +77,7 @@ if __name__ == '__main__':
         mAP = {}    # mean Average Precision
         mPrec = {}  # mean Precision
         mRec = {}   # mean Recall
-        miss = {}   # Misses from Matlab
+        miss = {}   # Log-Average Miss Rate from Matlab
         roc = {}    # Receiver Operating Characteristics from MATLAB (=[score fp tp])
         gt = {}     # Ground Truths from MATLAB
         dt = {}     # Detections from MATLAB
@@ -103,7 +103,7 @@ if __name__ == '__main__':
             mPrec[iter] = cfg.prec
             mRec[iter]  = cfg.rec
             # Also available for further evaluation (From MATLAB, not used yet):
-            #miss[iter]  = cfg.miss
+            miss[iter]  = cfg.miss
             #roc[iter]   = cfg.roc
             #gt[iter]    = cfg.gt
             #dt[iter]    = cfg.dt
@@ -117,15 +117,17 @@ if __name__ == '__main__':
         keys = mAP.keys()
         keys.sort()
         templine = []
-        mAP_outFile = os.path.join(get_output_dir(imdb, forKaist=True), 'mAP_mPrec_mRec.txt')
+        mAP_outFile = os.path.join(get_output_dir(imdb, forKaist=True), 'mAP_mPrec_mRec_laMiss.txt')
         print("########################################################################")
         print("########################################################################")
+        print("KEY   \tmAP   \tmPrec \tmRec  \tlaMiss:")
         for key in keys:
             value_mAP   = mAP.get(key)
             value_mPrec = mPrec.get(key)
             value_mRec  = mRec.get(key)
-            print("%d\t%.4f\t%.4f\t%.4f" % (key, value_mAP, value_mPrec, value_mRec))
-            templine.append("%d\t%.4f\t%.4f\t%.4f\n" % (key, value_mAP, value_mPrec, value_mRec))
+            value_miss  = miss.get(key)
+            print("%d\t%.4f\t%.4f\t%.4f\t%.4f" % (key, value_mAP, value_mPrec, value_mRec, value_miss))
+            templine.append("%d\t%.4f\t%.4f\t%.4f\t%.4f\n" % (key, value_mAP, value_mPrec, value_mRec, value_miss))
         with open(mAP_outFile, 'w+') as f:
             print("\n")
             logging.info("Results can be found under: " + str(train_test_outPath))
