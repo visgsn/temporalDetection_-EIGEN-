@@ -65,14 +65,16 @@ close(f);  % Close old figure
 f = figure(show);
 f.Position(3) = f.Position(3) * 2;  % Double figure width
 subplot(1,2,1);
-plot(fp, tp, 'b', 'LineWidth', 2);
+%plot(fp, tp, 'b', 'LineWidth', 2);
+semilogx(fp, tp, 'b', 'LineWidth', 2);
+axis([1e-3 1e1 0 1]);
 grid on;
 title("true positives / false positives per image");
 xlabel("FPPI [1 / image]"); ylabel("TP_{norm}");
 % TP and FP over score
 subplot(1,2,2);
 plot(scoreROC, tp, 'g', scoreROC, fp, 'r', 'LineWidth', 2);
-axis([0 100 0 min(3, max(max(fp), max(tp)))]);
+axis([0 100 0 2]);
 grid on;
 legend("TP_{norm}", "FPPI [1 / image]");
 title("true / false positives w.r.t. score");
