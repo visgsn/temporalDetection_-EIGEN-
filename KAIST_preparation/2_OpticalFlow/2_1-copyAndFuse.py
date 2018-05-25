@@ -28,7 +28,7 @@ atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 dataToExtract   = ['train-all-T', 'test-all-T']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
 imageStepSize   = 4  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS) (Default: 5)
 
-winSizeOptFlow  = 11  # Window size for optical flow calculation (Default: 10, smaller values --> higher resolution)
+winSizeOptFlow  = 13  # Window size for optical flow calculation (Default: 10, smaller values --> higher resolution)
 
 kaistDirHOME    = '/home/gueste/data/KAIST/data-kaist'
 kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
