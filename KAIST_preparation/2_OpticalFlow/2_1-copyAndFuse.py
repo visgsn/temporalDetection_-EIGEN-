@@ -23,10 +23,12 @@ from _usefulFunctions import *
 
 
 ##### Configurations ###################################################################################################
-atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
+atWORK          = False  # Choose which config to use: HOME (False) - WORK (True)
 
 dataToExtract   = ['train-all-T', 'test-all-T']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
-imageStepSize   = 5  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS)
+imageStepSize   = 5  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS) (Default: 5)
+
+winSizeOptFlow  = 12  # Window size for optical flow calculation (Default: 12, smaller values --> higher resolution)
 
 kaistDirHOME    = '/home/gueste/data/KAIST/data-kaist'
 kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
@@ -38,7 +40,7 @@ set_V_Pattern   = '(set[0-9]+_V[0-9]+)_'  # Used for comparison of predecessor i
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
-
+dataToExtract   = ['test-all-T', 'train-all-T']                                                                                 # ENTFERNEN!!!
 
 kaistDir = kaistDirWORK[:] if atWORK else kaistDirHOME[:]
 assert os.path.exists(kaistDir), \
@@ -56,7 +58,7 @@ for i, singleMainAnno in enumerate(mainAnnoFiles):
     _,mainName,_ = fileParts(singleMainAnno)
     mainAnnoFiles[i] = mainName
 
-### Copy necessary files from input datasets (see: dataToExtract) and execute image fusion
+### Copy necessary files from input datasets (see: dataToExtract) and execute Optical Flow conputation + image fusion
 for folder in dataToExtract:
     # Construct data output paths and create output directories
     outputDir = os.path.join(kaistDir, '2_{}_D{}'.format(folder, imageStepSize))                                        # Output path format!
@@ -117,7 +119,7 @@ for folder in dataToExtract:
     ### Determine predecessors of images which have to be combined (fused) to one single image in RGB format
     for i, singleImg in enumerate(imgFiles_out):
         tmpImgFiles = [singleImg, '', '']  # Stores original image path and its 2 predecessors
-        for predNr in range(1,3):
+        for predNr in range(1,2):
             predIndex = imgIndex_out[i] - (predNr * imageStepSize)
             if predIndex >= 0:
                 # Determine filenames for comparison of setXX_VXXX
@@ -135,20 +137,41 @@ for folder in dataToExtract:
         # Assign predecessors behind original image
         imgFiles_out[i] = tmpImgFiles[:]
 
-    ### Fuse and save images
+    ### Calculate Optical Flow + fuse and save images
     logging.info("Fusing and saving images for '{}'".format(folder))
     progressTenPercent = len(imgFiles_out) / 10  # Used to display progress while copying
     currentProgress = 0
     for i in range(0, len(imgFiles_out)):
         # Load original image (BGR-Format: BGR --> 012)
-        imgOrig = cv2.imread(imgFiles_out[i][0])
+        imgOrig         = cv2.imread(imgFiles_out[i][0])
+        imgOrig_gray    = cv2.cvtColor(imgOrig,cv2.COLOR_BGR2GRAY)
+        # Calculate optical flow in HSV format
+        hsv = np.zeros_like(imgOrig)
+        hsv[..., 1] = 255  # Set saturation to maximum
         # Replace channels G (1) and B (0) of original with predecessors R (2) channel
-        for predNr in range(1,3):
-            imgPred = cv2.imread(imgFiles_out[i][predNr])
-            imgOrig[:,:,2-predNr] = imgPred[:,:,2]
+        for predNr in range(1,2):
+            imgPred         = cv2.imread(imgFiles_out[i][predNr])
+            imgPred_gray    = cv2.cvtColor(imgPred,cv2.COLOR_BGR2GRAY)
+            # Calculate Optical Flow
+            flow = cv2.calcOpticalFlowFarneback(imgPred_gray, imgOrig_gray, None, 0.5, 3, winSizeOptFlow, 3, 5, 1.2, 0)
+            mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+            hsv[..., 0] = ang * 180 / np.pi / 2
+            hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+
+            # ONLY FOR DEBUGGING:
+            #gray = cv2.cvtColor(cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR), cv2.COLOR_BGR2GRAY)
+            if i>=98:
+                cv2.imshow('orig', hsv[:,:,2])
+                cv2.waitKey(1)
+                cv2.destroyAllWindows()
+
+
+
+
+            #imgOrig[:,:,2-predNr] = imgPred[:,:,2]
         # Save resulting image in target folder
-        outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
-        cv2.imwrite(outputFileName, imgOrig)
+        #outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
+        #cv2.imwrite(outputFileName, imgOrig)
 
         # Print progress status
         if 0 == i % progressTenPercent:
