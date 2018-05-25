@@ -26,9 +26,9 @@ from _usefulFunctions import *
 atWORK          = False  # Choose which config to use: HOME (False) - WORK (True)
 
 dataToExtract   = ['train-all-T', 'test-all-T']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
-imageStepSize   = 5  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS) (Default: 5)
+imageStepSize   = 4  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS) (Default: 5)
 
-winSizeOptFlow  = 12  # Window size for optical flow calculation (Default: 12, smaller values --> higher resolution)
+winSizeOptFlow  = 12  # Window size for optical flow calculation (Default: 10, smaller values --> higher resolution)
 
 kaistDirHOME    = '/home/gueste/data/KAIST/data-kaist'
 kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
@@ -148,30 +148,28 @@ for folder in dataToExtract:
         # Calculate optical flow in HSV format
         hsv = np.zeros_like(imgOrig)
         hsv[..., 1] = 255  # Set saturation to maximum
-        # Replace channels G (1) and B (0) of original with predecessors R (2) channel
+        # Replace channels G (1) and B (0) of original with Optical Flow estimation
         for predNr in range(1,2):
             imgPred         = cv2.imread(imgFiles_out[i][predNr])
             imgPred_gray    = cv2.cvtColor(imgPred,cv2.COLOR_BGR2GRAY)
             # Calculate Optical Flow
             flow = cv2.calcOpticalFlowFarneback(imgPred_gray, imgOrig_gray, None, 0.5, 3, winSizeOptFlow, 3, 5, 1.2, 0)
             mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
-            hsv[..., 0] = ang * 180 / np.pi / 2
+            #hsv[..., 0] = ang * 180 / np.pi / 2
             hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+            # Recombine images
+            imgOrig[:, :, 2 - predNr] = hsv[:,:,2]
 
             # ONLY FOR DEBUGGING:
             #gray = cv2.cvtColor(cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR), cv2.COLOR_BGR2GRAY)
             if i>=98:
-                cv2.imshow('orig', hsv[:,:,2])
+                cv2.imshow('orig', imgOrig)
                 cv2.waitKey(1)
                 cv2.destroyAllWindows()
 
-
-
-
-            #imgOrig[:,:,2-predNr] = imgPred[:,:,2]
         # Save resulting image in target folder
-        #outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
-        #cv2.imwrite(outputFileName, imgOrig)
+        outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
+        cv2.imwrite(outputFileName, imgOrig)
 
         # Print progress status
         if 0 == i % progressTenPercent:
