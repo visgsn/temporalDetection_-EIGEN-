@@ -23,12 +23,12 @@ from _usefulFunctions import *
 
 
 ##### Configurations ###################################################################################################
-atWORK          = False  # Choose which config to use: HOME (False) - WORK (True)
+atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
 dataToExtract   = ['train-all-T', 'test-all-T']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
 imageStepSize   = 4  # Distance between images in channel (R=t, G=t-1*iSS, B=t-2*iSS) (Default: 5)
 
-winSizeOptFlow  = 12  # Window size for optical flow calculation (Default: 10, smaller values --> higher resolution)
+winSizeOptFlow  = 11  # Window size for optical flow calculation (Default: 10, smaller values --> higher resolution)
 
 kaistDirHOME    = '/home/gueste/data/KAIST/data-kaist'
 kaistDirWORK    = '/net4/merkur/storage/deeplearning/users/gueste/data/KAIST/data-kaist'
@@ -40,7 +40,7 @@ set_V_Pattern   = '(set[0-9]+_V[0-9]+)_'  # Used for comparison of predecessor i
 logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 ########################################################################################################################
 
-dataToExtract   = ['test-all-T', 'train-all-T']                                                                                 # ENTFERNEN!!!
+
 
 kaistDir = kaistDirWORK[:] if atWORK else kaistDirHOME[:]
 assert os.path.exists(kaistDir), \
@@ -119,7 +119,7 @@ for folder in dataToExtract:
     ### Determine predecessors of images which have to be combined (fused) to one single image in RGB format
     for i, singleImg in enumerate(imgFiles_out):
         tmpImgFiles = [singleImg, '', '']  # Stores original image path and its 2 predecessors
-        for predNr in range(1,2):
+        for predNr in range(1,3):
             predIndex = imgIndex_out[i] - (predNr * imageStepSize)
             if predIndex >= 0:
                 # Determine filenames for comparison of setXX_VXXX
@@ -149,11 +149,14 @@ for folder in dataToExtract:
         hsv = np.zeros_like(imgOrig)
         hsv[..., 1] = 255  # Set saturation to maximum
         # Replace channels G (1) and B (0) of original with Optical Flow estimation
-        for predNr in range(1,2):
+        for predNr in range(1,3):
             imgPred         = cv2.imread(imgFiles_out[i][predNr])
             imgPred_gray    = cv2.cvtColor(imgPred,cv2.COLOR_BGR2GRAY)
             # Calculate Optical Flow
-            flow = cv2.calcOpticalFlowFarneback(imgPred_gray, imgOrig_gray, None, 0.5, 3, winSizeOptFlow, 3, 5, 1.2, 0)
+            if int(cv2.__version__[0]) < 3:  # Use cv2 version specific syntax
+                flow = cv2.calcOpticalFlowFarneback(imgPred_gray, imgOrig_gray, 0.5, 3, winSizeOptFlow, 3, 5, 1.2, 0)
+            else:
+                flow = cv2.calcOpticalFlowFarneback(imgPred_gray, imgOrig_gray, None, 0.5, 3, winSizeOptFlow, 3, 5, 1.2, 0)
             mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
             #hsv[..., 0] = ang * 180 / np.pi / 2
             hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
@@ -162,10 +165,10 @@ for folder in dataToExtract:
 
             # ONLY FOR DEBUGGING:
             #gray = cv2.cvtColor(cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR), cv2.COLOR_BGR2GRAY)
-            if i>=98:
-                cv2.imshow('orig', imgOrig)
-                cv2.waitKey(1)
-                cv2.destroyAllWindows()
+            # if i>=98:
+            #     cv2.imshow('orig', imgOrig)
+            #     cv2.waitKey(1)
+            #     cv2.destroyAllWindows()
 
         # Save resulting image in target folder
         outputFileName = os.path.join( imageDir_out, os.path.split(imgFiles_out[i][0])[1] )
@@ -175,6 +178,7 @@ for folder in dataToExtract:
         if 0 == i % progressTenPercent:
             logging.info(str(currentProgress) + "% complete")
             currentProgress += 10
+            # if i>0: sys.exit()  # ONLY FOR DEBUGGING
 
     ### Copy annotations
     logging.info("Copying annotations for '{}'".format(folder))
