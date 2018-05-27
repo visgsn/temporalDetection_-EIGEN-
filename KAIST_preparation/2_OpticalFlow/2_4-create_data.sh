@@ -24,7 +24,7 @@ data_root_dir_HOME="$HOME/data/KAIST"
 RefineDet_ROOT_WORK="$HOME/code/caffe/RefineDet"
 data_root_dir_WORK="/net4/merkur/storage/deeplearning/users/gueste/data/KAIST"
 
-trainsetName="3_train-all-T_D4"
+trainsetName="2_train-all-T_D4"
 tmpDetRepo_ROOT="$HOME/code/temporalDetection_-EIGEN-"
 mapfile="$tmpDetRepo_ROOT/KAIST_preparation/labelmap_KAIST.prototxt"
 ################################################################################

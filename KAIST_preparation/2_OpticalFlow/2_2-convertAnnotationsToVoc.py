@@ -18,7 +18,7 @@ from _usefulFunctions import *
 ##### Configurations ###################################################################################################
 atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
-dataToExtract   = ['3_train-all-T_D4', '3_test-all-T_D4']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
+dataToExtract   = ['2_train-all-T_D4', '2_test-all-T_D4']  # Expects: [<Train_Set>, <Test_Set>] (OutputSubdir <-- Train_Set name)
 excludeLabels   = ['people', 'person?', 'cyclist']
 useThermal      = True  # If False, 'RGB_'-images will be extracted. (Do not change this!)
 

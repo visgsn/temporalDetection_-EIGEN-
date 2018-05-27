@@ -20,8 +20,8 @@ from _usefulFunctions import *
 ##### CONFIGURATION ####################################################################################################
 atWORK          = True  # Choose which config to use: HOME (False) - WORK (True)
 
-trainImgSub     = '3_train-all-T_D4' # Desired training subset of dataKaist (Contains .png IMAGES!)
-testImgSub      = '3_test-all-T_D4'  # Desired test subset of dataKaist (Contains .png IMAGES!)
+trainImgSub     = '2_train-all-T_D4' # Desired training subset of dataKaist (Contains .png IMAGES!)
+testImgSub      = '2_test-all-T_D4'  # Desired test subset of dataKaist (Contains .png IMAGES!)
 
 useThermal      = True              # If False, 'RGB_'-images will be extracted. (Do not change this!)
 shuffleFiles    = True              # Randomize order of train images
