@@ -39,6 +39,11 @@ train_test_outPath = sprintf(...
     '%s/models/VGGNet/KAIST/%s/%s',...
     path_prefix, subsetName, job_name);
 
+%% Add Toolbox path to matlab path
+thisDir = fileparts(which('KAIST_plotTestResults.m'));
+piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/'];
+addpath( genpath( piotrToolboxPath ) );
+
 % Iterate through all experiments
 for expName = 1:length(experimentNames)
     %% Construct complete input paths
@@ -51,25 +56,26 @@ for expName = 1:length(experimentNames)
             ['WARNING: Path for experiment named %s does not exist!', ...
             ' --> Run KAIST_test.py?!\n'], experimentNames(expName));
     end
-    % Search for correct input file with person detections
+    %% Search for correct input file with person detections
     filesInOutDir = dir(inOutDir);  % List all files in inOutDir
     for i = 1:length(filesInOutDir)
         if contains(filesInOutDir(i).name, resultFileName) && ...
                     filesInOutDir(i).isdir == 0
             resultFile = sprintf(...
                 '%s/%s', filesInOutDir(i).folder, filesInOutDir(i).name);
+            fprintf('Found File: %s\n', resultFile);
             break
         end
     end
-
-    %% Add Toolbox path to matlab path
-    thisDir = fileparts(which('KAIST_plotTestResults.m'));
-    piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/'];
-    addpath( genpath( piotrToolboxPath ) );
-
-
+    
+    %% Load resultFile data
+    % resultValues = [iter, mAP, mPrec, mRec, lamr]
+    resultValues = importResultFile(resultFile);
+    % Rank according to lamr values
+    resultValSorted = sortrows(resultValues, 'lamr');
 
     %% Call function to plot results
+    disp(resultValues);
     
 end
 
