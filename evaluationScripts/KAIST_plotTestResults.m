@@ -11,8 +11,13 @@
 % Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
 atWork = false;
 
-subsetName     = 'train-all-T';
-job_name       = 'Tr11_HOME_i10k_Adam_512x512';  % DEFAULT: 'refinedet_vgg16_320x320'
+subsetName = 'train-all-T';
+job_name   = 'Tr11_HOME_i10k_Adam_512x512';  % DEFAULT: 'refinedet_vgg16_320x320'
+% Optional: Use the following path directly with 'useDirectJobPath = true'
+useDirectJobPath = false;
+directJobPath = ...
+    '/home/gueste/train_test_data/models/VGGNet/KAIST/train-all-T/Tr10_i40k_Adam_DROP_lr0001STEP_512x512';
+
 experimentNames = ...  % Name of evalOutput subfolder (experiment name)
     ["singleScale", "multiScale"];
 
@@ -20,24 +25,28 @@ experimentNames = ...  % Name of evalOutput subfolder (experiment name)
 path_prefix_HOME = sprintf('%s/train_test_data', getenv('HOME'));
 path_prefix_WORK = '/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test';
 % Result file to read
-inputFileName   = 'mAP_mPrec_mRec_laMiss.txt';
+inputFileName    = 'mAP_mPrec_mRec_laMiss.txt';
 %##########################################################################
 
 %% Construct basic paths from config
-if atWork == true
-    path_prefix = path_prefix_WORK;
+if useDirectJobPath == false
+    if atWork == true
+        path_prefix = path_prefix_WORK;
+    else
+        path_prefix = path_prefix_HOME;
+    end
+
+    train_test_outPath = sprintf(...
+        '%s/models/VGGNet/KAIST/%s/%s',...
+        path_prefix, subsetName, job_name);
 else
-    path_prefix = path_prefix_HOME;
+    train_test_outPath = directJobPath;
 end
-
-if ( ~exist(path_prefix, 'dir') )
+% Check paths
+if ( ~exist(train_test_outPath, 'dir') )
     error('KAIST_showTestResults:DirectoryNotFound', ...
-        'Path for path_prefix does not exist! --> atWORK = ?!');
+        'Path for train_test_outPath does not exist! --> atWORK = ?!');
 end
-
-train_test_outPath = sprintf(...
-    '%s/models/VGGNet/KAIST/%s/%s',...
-    path_prefix, subsetName, job_name);
 
 outDir = sprintf(...
     '%s/evalOutput/', ...
@@ -51,7 +60,7 @@ addpath( genpath( piotrToolboxPath ) );
 %% Prepare figure for result plot
 f = figure();
 axis([-inf inf 0 100]); grid on;
-title("log-average miss rate");
+title("training progress: log-average miss rate");
 xlabel("iterations"); ylabel("log-average miss rate [%]");
 hold on;
 legend on;
@@ -104,6 +113,6 @@ frame=getframe(f);
 [X,~]=frame2im(frame);
 imwrite(X,[outputFileName '.png'], 'png');
 close(f);  % Close old figure
-
-fprintf('Saved output files as: %s%s\n', outputFileName, '.<ext>');
+% Print info message
+fprintf('Saved output files to: %s%s\n', outputFileName, '.<ext>');
 
