@@ -20,7 +20,7 @@ experimentNames = ...  % Name of evalOutput subfolder (experiment name)
 path_prefix_HOME = sprintf('%s/train_test_data', getenv('HOME'));
 path_prefix_WORK = '/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test';
 % Result file to read
-resultFileName   = 'mAP_mPrec_mRec_laMiss.txt';
+inputFileName   = 'mAP_mPrec_mRec_laMiss.txt';
 %##########################################################################
 
 %% Construct basic paths from config
@@ -39,27 +39,39 @@ train_test_outPath = sprintf(...
     '%s/models/VGGNet/KAIST/%s/%s',...
     path_prefix, subsetName, job_name);
 
+outDir = sprintf(...
+    '%s/evalOutput/', ...
+    train_test_outPath);
+
 %% Add Toolbox path to matlab path
 thisDir = fileparts(which('KAIST_plotTestResults.m'));
 piotrToolboxPath = [thisDir, '/../piotr-toolbox-3.40/'];
 addpath( genpath( piotrToolboxPath ) );
 
-% Iterate through all experiments
-for expName = 1:length(experimentNames)
+%% Prepare figure for result plot
+f = figure();
+axis([-inf inf 0 100]); grid on;
+title("log-average miss rate");
+xlabel("iterations"); ylabel("log-average miss rate [%]");
+hold on;
+legend on;
+
+%% Iterate through all experiments
+for expNameIter = 1:length(experimentNames)
     %% Construct complete input paths
-    inOutDir = sprintf(...
-        '%s/evalOutput/%s/', ...
-        train_test_outPath, experimentNames(expName));
+    inDir = sprintf(...
+        '%s%s/', ...
+        outDir, experimentNames(expNameIter));
     % Check if path exists
-    if ( ~exist(inOutDir, 'dir') )
+    if ( ~exist(inDir, 'dir') )
         fprintf( ...
             ['WARNING: Path for experiment named %s does not exist!', ...
-            ' --> Run KAIST_test.py?!\n'], experimentNames(expName));
+            ' --> Run KAIST_test.py?!\n'], experimentNames(expNameIter));
     end
     %% Search for correct input file with person detections
-    filesInOutDir = dir(inOutDir);  % List all files in inOutDir
+    filesInOutDir = dir(inDir);  % List all files in inDir
     for i = 1:length(filesInOutDir)
-        if contains(filesInOutDir(i).name, resultFileName) && ...
+        if contains(filesInOutDir(i).name, inputFileName) && ...
                     filesInOutDir(i).isdir == 0
             resultFile = sprintf(...
                 '%s/%s', filesInOutDir(i).folder, filesInOutDir(i).name);
@@ -74,8 +86,24 @@ for expName = 1:length(experimentNames)
     % Rank according to lamr values
     resultValSorted = sortrows(resultValues, 'lamr');
 
-    %% Call function to plot results
-    disp(resultValues);
-    
+    %% Plot results
+    plot(resultValues.iter, resultValues.lamr * 100, '-+', ...
+        'DisplayName', experimentNames(expNameIter), 'LineWidth', 2);
+    % Mark best datapoints (minimal LAMR)
+    plot(resultValSorted.iter(1), resultValSorted.lamr(1) * 100, 'd', ...
+        'DisplayName', ...
+        sprintf('Best_{%s} = %.1f%%', experimentNames(expNameIter), ...
+                 resultValSorted.lamr(1)*100), ...
+        'LineWidth', 2, 'MarkerSize', 8);
 end
+
+%% Save results as figure and image
+outputFileName = [outDir, 'LAMR_results_plotted'];
+savefig([outputFileName '.fig']);
+frame=getframe(f);
+[X,~]=frame2im(frame);
+imwrite(X,[outputFileName '.png'], 'png');
+close(f);  % Close old figure
+
+fprintf('Saved output files as: %s%s\n', outputFileName, '.<ext>');
 
