@@ -26,8 +26,7 @@ if __name__ == '__main__':
     redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
-    job_names       = [#"Tr11_HOME_i10k_Adam_512x512",
-                       #"refinedet_50home_320x320",
+    job_names       = [#"refinedet_50home_320x320",
                        #"refdet_i40k_Adam_DROPOUT_512x512",
                        #"refdet_i100k_Adam_512x512",
                        #"refdet_i100k_Adam_DROPOUT_512x512",
