@@ -27,3 +27,6 @@ In order to get the Code Working, install prerequisits and follow the instructio
   
   Aditionally install the "MATLAB Engine", since it's needed by the evaluation scripts. Just follow the instructions on the link below:
   https://de.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+
+- Replace original RefineDet files with adapted ones from ".../temporalDetection_-EIGEN-/RefineDet_adaptions/":
+  Detailed instructions for each file can be found there, too (see README.md file).
