@@ -327,7 +327,13 @@ def ZFNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
 
 
 def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
-        dilated=False, nopool=False, dropout=True, freeze_layers=[], dilate_pool4=False):
+        dilated=False, nopool=False, dropout=True, freeze_layers=[], trainHard_layers=[], trainHard_factor=2,
+        dilate_pool4=False):
+    '''
+    :param freeze_layers: These layers will not be trained further
+    :param trainHard_layers: These layers will be trained with a higher learning rate than the others
+    :param trainHard_factor: Learning rate factor to use for layers specified in trainHard_layers
+    '''
     kwargs = {
             'param': [dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
             'weight_filler': dict(type='xavier'),
@@ -465,6 +471,13 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
     for freeze_layer in freeze_layers:
         if freeze_layer in layers:
             net.update(freeze_layer, kwargs)
+
+    # Update trainHard layers.
+    kwargs['param'] = [dict(lr_mult=1*trainHard_factor, decay_mult=1), dict(lr_mult=2, decay_mult=0)]
+    layers = net.keys()
+    for trainHard_layer in trainHard_layers:
+        if trainHard_layer in layers:
+            net.update(trainHard_layer, kwargs)
 
     return net
 
