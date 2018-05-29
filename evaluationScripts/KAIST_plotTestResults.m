@@ -61,7 +61,7 @@ addpath( genpath( piotrToolboxPath ) );
 f = figure();
 axis([-inf inf 0 100]); grid on;
 title("training progress: log-average miss rate");
-xlabel("iterations"); ylabel("log-average miss rate [%]");
+xlabel("iterations"); ylabel("LAMR [%]");
 hold on;
 legend on;
 
@@ -101,8 +101,9 @@ for expNameIter = 1:length(experimentNames)
     % Mark best datapoints (minimal LAMR)
     plot(resultValSorted.iter(1), resultValSorted.lamr(1) * 100, 'd', ...
         'DisplayName', ...
-        sprintf('Best_{%s} = %.1f%%', experimentNames(expNameIter), ...
-                 resultValSorted.lamr(1)*100), ...
+        sprintf('--> Top_{LAMR} = %.1f%% at %d', ...
+                resultValSorted.lamr(1)*100, ...
+                resultValSorted.iter(1)), ...
         'LineWidth', 2, 'MarkerSize', 8);
 end
 
@@ -112,7 +113,7 @@ savefig([outputFileName '.fig']);
 frame=getframe(f);
 [X,~]=frame2im(frame);
 imwrite(X,[outputFileName '.png'], 'png');
-close(f);  % Close old figure
 % Print info message
 fprintf('Saved output files to: %s%s\n', outputFileName, '.<ext>');
+close(f);  % Close old figure
 
