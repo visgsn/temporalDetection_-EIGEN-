@@ -14,9 +14,9 @@ atWork = false;
 subsetName = 'train-all-T';
 job_name   = 'Tr11_HOME_i10k_Adam_512x512';  % DEFAULT: 'refinedet_vgg16_320x320'
 % Optional: Use the following path directly with 'useDirectJobPath = true'
-useDirectJobPath = false;
+useDirectJobPath = true;
 directJobPath = ...
-    '/home/gueste/train_test_data/models/VGGNet/KAIST/train-all-T/Tr10_i40k_Adam_DROP_lr0001STEP_512x512';
+    '/home/gueste/train_test_data/models/VGGNet/KAIST/train-all-T/refdet_i200k_lr001_DROPOUT_NEW_512x512';
 
 experimentNames = ...  % Name of evalOutput subfolder (experiment name)
     ["singleScale", "multiScale"];
@@ -44,7 +44,7 @@ else
 end
 % Check paths
 if ( ~exist(train_test_outPath, 'dir') )
-    error('KAIST_showTestResults:DirectoryNotFound', ...
+    error('KAIST_plotTestResults:DirectoryNotFound', ...
         'Path for train_test_outPath does not exist! --> atWORK = ?!');
 end
 
@@ -76,8 +76,10 @@ for expNameIter = 1:length(experimentNames)
         fprintf( ...
             ['WARNING: Path for experiment named %s does not exist!', ...
             ' --> Run KAIST_test.py?!\n'], experimentNames(expNameIter));
+        continue;  % Skip this experiment
     end
     %% Search for correct input file with person detections
+    resultFile = '';
     filesInOutDir = dir(inDir);  % List all files in inDir
     for i = 1:length(filesInOutDir)
         if contains(filesInOutDir(i).name, inputFileName) && ...
@@ -88,9 +90,14 @@ for expNameIter = 1:length(experimentNames)
             break
         end
     end
+    % File found?
+    if ( ~exist(resultFile, 'file') )
+        error('KAIST_plotTestResults:FileNotFound', ...
+        'Result file for %s not found!', experimentNames(expNameIter));
+    end
     
     %% Load resultFile data
-    % resultValues = [iter, mAP, mPrec, mRec, lamr]
+    % Structure: resultValues = [iter, mAP, mPrec, mRec, lamr]
     resultValues = importResultFile(resultFile);
     % Rank according to lamr values
     resultValSorted = sortrows(resultValues, 'lamr');
@@ -105,6 +112,17 @@ for expNameIter = 1:length(experimentNames)
                 resultValSorted.lamr(1)*100, ...
                 resultValSorted.iter(1)), ...
         'LineWidth', 2, 'MarkerSize', 8);
+    
+    %% Display top results
+    dimRes = size(resultValSorted);
+    fprintf('Top 3 results for >%s<:\n', experimentNames(expNameIter));
+    for top = 1:min(3, dimRes(1))
+       fprintf( ...
+           'It: %d\tLAMR: %.1f\tmAP: %.2f\tmPrec: %.2f\tmRec: %.2f\n',...
+           resultValSorted.iter(top), resultValSorted.lamr(top)*100, ...
+           resultValSorted.mAP(top), resultValSorted.mPrec(top), ...
+           resultValSorted.mRec(top) );
+    end
 end
 
 %% Save results as figure and image
