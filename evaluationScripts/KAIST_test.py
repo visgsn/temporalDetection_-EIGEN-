@@ -26,11 +26,27 @@ if __name__ == '__main__':
     redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
     subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
-    job_names       = ["refinedet_vgg16_320x320"]  # DEFAULT: ["refinedet_vgg16_320x320"]
-    experimentName  = "singleScale"  # Name of evalOutput subfolder (experiment name)
+    job_names       = [#"Tr11_HOME_i10k_Adam_512x512",
+                       #"refinedet_50home_320x320",
+                       #"refdet_i40k_Adam_DROPOUT_512x512",
+                       #"refdet_i100k_Adam_512x512",
+                       #"refdet_i100k_Adam_DROPOUT_512x512",
+                       #"refdet_i200k_lr001_320x320",
+                       #"refdet_i200k_lr001_512x512",
+                       #"refdet_i200k_lr001_DROPOUT_320x320",
+                       #"refdet_i200k_lr001_DROPOUT_512x512",
+                       #"refdet_i200k_lr001_DROPOUT_NEW_512x512",
+                       #"refdet_i10k_DROPOUT_test_320x320",
+                       #"refinedet_it50184_320x320",
+                       #"Tr10_i40k_Adam_DROP_lr0001STEP_512x512",
+                       #"Tr11_HOME_i10k_Adam_512x512",
+                       "Tr12_i20k_Adam_512x512",
+                       ]  # DEFAULT: ["refinedet_vgg16_320x320"]
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     visualizeDets   = False  # Show Detections while testing?
+    # Optional postfix for evalOutput subfolder (experiment name) -> If set: <experimentName>_<expNamePostfix>
+    expNamePostfix  = ""  # DEFAULT: ""
 
     useGPU          = True  # Default: True
 
@@ -44,6 +60,10 @@ if __name__ == '__main__':
     path_prefix = path_prefix_WORK if atWork else path_prefix_HOME
     assert os.path.exists(path_prefix), \
         "Path {} does not exist! --> atWORK = ?".format(path_prefix)
+    # Automatically set experiment name
+    experimentName = "singleScale" if single_scale else "multiScale"
+    if expNamePostfix != "":
+        experimentName = "{}_{}".format(experimentName, expNamePostfix)  # Add Postfix, if set
 
 
     for job_name in job_names:
