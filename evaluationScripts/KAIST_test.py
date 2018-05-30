@@ -25,7 +25,7 @@ if __name__ == '__main__':
     doMatlabEval    = True  # If True: Use additional MATLAB test evaluation (on "test-all")
     redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
-    subsetName      = "train-all-T"  # Adapt --> "factory.py" for all available subsets!
+    subsetName      = "3_train-all-T_D4"  # Adapt --> "factory.py" for all available subsets!
     job_names       = [#"refinedet_50home_320x320",
                        #"refdet_i40k_Adam_DROPOUT_512x512",
                        #"refdet_i100k_Adam_512x512",
@@ -39,7 +39,15 @@ if __name__ == '__main__':
                        #"refinedet_it50184_320x320",
                        #"Tr10_i40k_Adam_DROP_lr0001STEP_512x512",
                        #"Tr11_HOME_i10k_Adam_512x512",
-                       "Tr12_i20k_Adam_512x512",
+                       #"Tr12_i20k_Adam_512x512",
+                       #"Tr13_NEW_i20k_lr001_bs180_512x512",
+                       "3_Tr1_3FpI_i60k_320x320",
+                       "3_Tr2_3FpI_D4_512x512",
+                       "3_Tr3_3FpI_D4_320x320",
+                       "3_Tr4_3FpI_D4_512x512",
+                       "3_Tr5_3FpI_D4_320x320",
+                       "3_Tr6_3FpI_D4_512x512",
+                       "3_Tr7_3FpI_D4_320x320",
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
