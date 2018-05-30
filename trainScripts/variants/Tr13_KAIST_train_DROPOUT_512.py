@@ -43,7 +43,7 @@ batch_size_WORK     = 10
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 180  # Must be a multiple of batch_size
 
-job_name_template = "Tr13_NEW_i20k_lr002_bs180_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "Tr13_NEW_i20k_lr001_bs180_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "train-all-T"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 

@@ -58,6 +58,10 @@ prefix_saveSnapJob_HOME = "{}/train_test_data".format(os.environ['HOME'])
 prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
 ### Extra options for using pretrained model from 3_Tr7-1_TrainHeadHard...
+trainHard_layers    = ["conv1_1", "conv1_2"]  # Layers to train harder (in VGGNetBody)
+trainHard_factor    = 0.01  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
+freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
+lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
 # Choose best pretrained weights model
 pretrain_model = \
     "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/3_train-all-T_D4/3_Tr7_3FpI_D4_320x320/3_Tr7-1 (Vortraining)/KAIST_3_Tr7_3FpI_D4_320x320_iter_800.caffemodel"
@@ -287,7 +291,7 @@ test_transform_param = {
 # If true, use batch norm for all newly added layers.
 # Currently only the non batch norm version has been tested.
 use_batchnorm = False
-lr_mult = 1
+#lr_mult = 1                            # ORIGINAL
 # Use different initial learning rate.
 if use_batchnorm:
     base_lr = 0.0004
@@ -498,7 +502,8 @@ net.data, net.label = CreateAnnotatedDataLayer(train_data, batch_size=batch_size
         train=True, output_label=True, label_map_file=label_map_file,
         transform_param=train_transform_param, batch_sampler=batch_sampler)
 
-VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=useDropout)
+VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=useDropout,
+           freeze_layers=freeze_layers, trainHard_layers=trainHard_layers, trainHard_factor=trainHard_factor)
 
 AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult)
 arm_source_layers.reverse()
