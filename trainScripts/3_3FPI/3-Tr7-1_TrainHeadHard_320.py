@@ -31,8 +31,8 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 30000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
-snapshot_train  = 2000  # Number of iterations to take a snapshot
+max_iter_train  = 1000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+snapshot_train  = 50  # Number of iterations to take a snapshot
 base_lr_train   = 0.0001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = False  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
