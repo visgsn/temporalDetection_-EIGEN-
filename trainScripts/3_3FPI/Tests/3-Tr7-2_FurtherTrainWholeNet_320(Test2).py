@@ -62,7 +62,7 @@ trainHard_layers    = ["conv1_1", "conv1_2",
                        "conv2_1", "conv2_2",
                        "conv3_1", "conv3_2", "conv3_3",
                        "conv4_1", "conv4_2", "conv4_3",
-                       "conv5_1", "conv5_1", "conv5_1",
+                       "conv5_1", "conv5_2", "conv5_3",
                        ]  # Layers to train harder (in VGGNetBody)
 trainHard_factor    = 0.01  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
 freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained

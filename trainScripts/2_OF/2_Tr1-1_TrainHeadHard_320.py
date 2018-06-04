@@ -31,9 +31,11 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 1000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+max_iter_train  = 1500  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
 snapshot_train  = 50  # Number of iterations to take a snapshot
-base_lr_train   = 0.0001  # Learning rate to start with (ORIGINAL: 0.0005)
+base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
+stepvalues      = [50000]  # Iteration values for changing learning rate
+gamma           = 0.1  # Reduce learning rate by this factor when a certain stepvalue is reached
 useDropout      = False  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
 
@@ -43,8 +45,8 @@ batch_size_WORK     = 30
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 120  # Must be a multiple of batch_size
 
-job_name_template = "3_Tr7_3FpI_D4_TEST2_{}"  # Job name for output (Brackets will be filled with resize info!)
-subsetName        = "3_train-all-T_D4"  # Subset name to train on (existing)
+job_name_template = "2_Tr1-1_OF_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
+subsetName        = "2_train-all-T_D4"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
 caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])  # The directory which contains the caffe code.
@@ -61,13 +63,14 @@ prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINI
 ### Extra options for training single layers harder than others
 trainHard_layers    = ["conv1_1", "conv1_2",
                        "conv2_1", "conv2_2",
-                       "conv3_1", "conv3_2", "conv3_3",
-                       "conv4_1", "conv4_2", "conv4_3",
-                       "conv5_1", "conv5_2", "conv5_3",
-                       ]  # Layers to train harder (in VGGNetBody)
-trainHard_factor    = 20  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
+                      ]  # Layers to train harder (in VGGNetBody)
+trainHard_factor    = 5  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
 freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
-lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
+lr_mult             = 0  # Learning rate factor for rest of net (eccept VGGNetBody!)
+# Choose best pretrained weights model
+pretrain_model = \
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/train-all-T/" \
+    "refinedet_50home_320x320/KAIST_refinedet_50home_320x320_iter_40000.caffemodel"
 ########################################################################################################################
 
 
@@ -336,7 +339,7 @@ name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, 
 # Stores LabelMapItem.
 label_map_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet. (Used if resume_training = False)
-pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
+#pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
 
 # MultiBoxLoss parameters.
 #num_classes = 21                                                                # ORIGINAL
@@ -444,8 +447,8 @@ solver_param = {
     'base_lr': base_lr_train,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [50000],
-    'gamma': 0.1,
+    'stepvalue': stepvalues,
+    'gamma': gamma,
     'momentum': 0.9,
     'iter_size': iter_size,
     #'max_iter': 120000,                        # ORIGINAL
