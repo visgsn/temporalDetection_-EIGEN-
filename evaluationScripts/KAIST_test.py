@@ -41,13 +41,16 @@ if __name__ == '__main__':
                        #"Tr11_HOME_i10k_Adam_512x512",
                        #"Tr12_i20k_Adam_512x512",
                        #"Tr13_NEW_i20k_lr001_bs180_512x512",
-                       "3_Tr1_3FpI_i60k_320x320",
-                       "3_Tr2_3FpI_D4_512x512",
-                       "3_Tr3_3FpI_D4_320x320",
-                       "3_Tr4_3FpI_D4_512x512",
-                       "3_Tr5_3FpI_D4_320x320",
-                       "3_Tr6_3FpI_D4_512x512",
-                       "3_Tr7_3FpI_D4_320x320",
+                       #"3_Tr1_3FpI_i60k_320x320",
+                       #"3_Tr2_3FpI_D4_512x512",
+                       #"3_Tr3_3FpI_D4_320x320",
+                       #"3_Tr4_3FpI_D4_512x512",
+                       #"3_Tr5_3FpI_D4_320x320",
+                       #"3_Tr6_3FpI_D4_512x512",
+                       #"3_Tr7_3FpI_D4_320x320",
+                       "3_Tr7_3FpI_D4_TEST1_320x320",
+                       "3_Tr7_3FpI_D4_TEST2_320x320",
+                       #"3_Tr8_3FpI_D4_320x320",
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
