@@ -22,6 +22,7 @@ possible_gpus = {}
 # Define all possible GPUs for your process as list, e.g. ["0", "1"], with the corresponding server name
 possible_gpus['d']  = ["0", "1", "2", "3"]  # ***deneb***
 possible_gpus['z']  = ["1", "3"]            # ***zaurak***
+possible_gpus['m']  = ["0", "1"]            # ***minkar***
 possible_gpus['s']  = ["0"]                 # ***sadr***    (Indeces twisted! "0"-->GPU#1, "1"-->GPU#0)
 possible_gpus['h']  = ["0"]                 # ***at Home***
 
