@@ -29,23 +29,23 @@ run_soon = True
 # Set if you want to load from most recently saved snapshot. False: load from pretrain_model (DEFAULT: True)
 resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
-remove_old_models = False
+remove_old_models = True
 
-max_iter_train  = 15000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
-snapshot_train  = 500  # Number of iterations to take a snapshot
-base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
-stepvalues      = [50000]  # Iteration values for changing learning rate
+max_iter_train  = 1600  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+snapshot_train  = 50  # Number of iterations to take a snapshot
+base_lr_train   = 0.0001  # Learning rate to start with (ORIGINAL: 0.0005)
+stepvalues      = [1400]  # Iteration values for changing learning rate
 gamma           = 0.1  # Reduce learning rate by this factor when a certain stepvalue is reached
 useDropout      = False  # If true: Use dropout for training
-useResize512    = False  # False: 320x320   True: 512x512
+useResize512    = True  # False: 320x320   True: 512x512
 
 # Batch size for training (Actual batch size on Hardware)
-batch_size_HOME     = 8
-batch_size_WORK     = 30
+batch_size_HOME     = 3
+batch_size_WORK     = 10
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 120  # Must be a multiple of batch_size
 
-job_name_template = "2_Tr1-2_OF_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "2_Tr3_OF_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "2_train-all-T_D4"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
@@ -59,20 +59,18 @@ dataset_root_WORK = "/net4/merkur/storage/deeplearning/users/gueste/data/{}".for
 prefix_saveSnapJob_HOME = "{}/train_test_data".format(os.environ['HOME'])
 prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
-### Extra options for using pretrained model from 3_Tr<X>-1_TrainHeadHard...
+
+### Extra options for training single layers harder than others
 trainHard_layers    = ["conv1_1", "conv1_2",
                        "conv2_1", "conv2_2",
-                       "conv3_1", "conv3_2", "conv3_3",
-                       "conv4_1", "conv4_2", "conv4_3",
-                       "conv5_1", "conv5_2", "conv5_3",
                       ]  # Layers to train harder (in VGGNetBody)
-trainHard_factor    = 0.01  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
+trainHard_factor    = 50  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
 freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
 lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
 # Choose best pretrained weights model
 pretrain_model = \
-    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/2_train-all-T_D4/" \
-    "2_Tr1-2_OF_D4_320x320/2_Tr1-1_OF_D4_320x320 (Vortr)/KAIST_2_Tr1-1_OF_D4_320x320_iter_1100.caffemodel"
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/train-all-T/" \
+    "Tr13_NEW_i20k_lr001_bs180_512x512/KAIST_Tr13_NEW_i20k_lr001_bs180_512x512_iter_3000.caffemodel"
 ########################################################################################################################
 
 

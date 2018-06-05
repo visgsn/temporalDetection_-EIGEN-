@@ -69,7 +69,8 @@ freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
 lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
 # Choose best pretrained weights model
 pretrain_model = \
-    ""
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/2_train-all-T_D4/" \
+    "2_Tr2-2_OF_D4_320x320/2_Tr2-1_OF_D4_320x320 (Vortr)/KAIST_2_Tr2-1_OF_D4_320x320_iter_1350.caffemodel"
 ########################################################################################################################
 
 
