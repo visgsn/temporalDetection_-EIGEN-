@@ -1,5 +1,5 @@
 '''
-    USAGE: python StartToTrainIfGPUFree <Script_to_start_on_a_GPU.py> <GPU_list_to_use>
+    USAGE: python StartToTrainIfGPUFree <Script_to_start_on_a_GPU.py> <GPU_list_to_use (Or GPU number)>
 
     (Insert e.g.
 
@@ -33,8 +33,11 @@ logging.basicConfig(format='%(asctime)s:  %(message)s', datefmt='%m/%d/%Y %I:%M:
 
 
 
-# Choose possible GPUs from given list
-possible_gpus_extracted = possible_gpus[str(sys.argv[2])]
+# Choose possible GPUs from given list or take given GPU number if not in list
+possible_gpus_extracted = possible_gpus[str(sys.argv[2])] if str(sys.argv[2]) in possible_gpus else [str(sys.argv[2])]
+print(">>> Possible GPUs for process '{}': {} <<<".format(str(sys.argv[1]), possible_gpus_extracted))
+sleep(3)
+
 
 def main():
     # Init counter
