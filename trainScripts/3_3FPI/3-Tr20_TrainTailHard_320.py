@@ -31,9 +31,9 @@ resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = True
 
-max_iter_train  = 16000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+max_iter_train  = 15000  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
 snapshot_train  = 500  # Number of iterations to take a snapshot
-base_lr_train   = 0.0001  # Learning rate to start with (ORIGINAL: 0.0005)
+base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
 useDropout      = False  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
 
@@ -43,7 +43,7 @@ batch_size_WORK     = 30
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 120  # Must be a multiple of batch_size
 
-job_name_template = "3_Tr17_3FpI_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "3_Tr20_3FpI_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "3_train-all-T_D4"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
@@ -63,8 +63,8 @@ trainHard_layers    = [
                       ]  # Layers to train harder (in VGGNetBody)
 trainHard_factor    = 1  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
 freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
-lr_mult_extra       = 10  # Learning rate factor for ExtraLayers (Transfer Connection Blocks!)
-lr_mult_refHead     = 30  # Learning rate factor for rest of net (RefineDet Head!)
+lr_mult_extra       = 5  # Learning rate factor for ExtraLayers (Transfer Connection Blocks!)
+lr_mult_refHead     = 10  # Learning rate factor for rest of net (RefineDet Head!)
 # Choose best pretrained weights model
 pretrain_model = \
     "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/train-all-T/" \
@@ -445,11 +445,7 @@ solver_param = {
     'base_lr': base_lr_train,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-<<<<<<< HEAD
-    'stepvalue': [3000],
-=======
-    'stepvalue': [15000],
->>>>>>> Added / adapted some train scripts (again)
+    'stepvalue': [13000],
     'gamma': 0.1,
     'momentum': 0.9,
     'iter_size': iter_size,
