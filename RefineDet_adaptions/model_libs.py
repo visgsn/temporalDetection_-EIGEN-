@@ -328,11 +328,12 @@ def ZFNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
 
 def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
         dilated=False, nopool=False, dropout=True, freeze_layers=[], trainHard_layers=[], trainHard_factor=2,
-        dilate_pool4=False):
+        dilate_pool4=False, retrain_arm_odm=False):
     '''
     :param freeze_layers: These layers will not be trained further
     :param trainHard_layers: These layers will be trained with a higher learning rate than the others
     :param trainHard_factor: Learning rate factor to use for layers specified in trainHard_layers
+    :param retrain_arm_odm: Renames the arm source layers, if set. Causing retraining from scratch
     '''
     kwargs = {
             'param': [dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
@@ -383,8 +384,12 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
     net.relu4_1 = L.ReLU(net.conv4_1, in_place=True)
     net.conv4_2 = L.Convolution(net.relu4_1, num_output=512, pad=1, kernel_size=3, **kwargs)
     net.relu4_2 = L.ReLU(net.conv4_2, in_place=True)
-    net.conv4_3 = L.Convolution(net.relu4_2, num_output=512, pad=1, kernel_size=3, **kwargs)
-    net.relu4_3 = L.ReLU(net.conv4_3, in_place=True)
+    if retrain_arm_odm:
+        net.conv4_3_re = L.Convolution(net.relu4_2, num_output=512, pad=1, kernel_size=3, **kwargs)
+        net.relu4_3 = L.ReLU(net.conv4_3_re, in_place=True)
+    else:
+        net.conv4_3 = L.Convolution(net.relu4_2, num_output=512, pad=1, kernel_size=3, **kwargs)
+        net.relu4_3 = L.ReLU(net.conv4_3, in_place=True)
 
     if nopool:
         name = 'conv4_4'
@@ -404,8 +409,12 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
     net.relu5_1 = L.ReLU(net.conv5_1, in_place=True)
     net.conv5_2 = L.Convolution(net.relu5_1, num_output=512, pad=pad, kernel_size=kernel_size, dilation=dilation, **kwargs)
     net.relu5_2 = L.ReLU(net.conv5_2, in_place=True)
-    net.conv5_3 = L.Convolution(net.relu5_2, num_output=512, pad=pad, kernel_size=kernel_size, dilation=dilation, **kwargs)
-    net.relu5_3 = L.ReLU(net.conv5_3, in_place=True)
+    if retrain_arm_odm:
+        net.conv5_3_re = L.Convolution(net.relu5_2, num_output=512, pad=pad, kernel_size=kernel_size, dilation=dilation, **kwargs)
+        net.relu5_3 = L.ReLU(net.conv5_3_re, in_place=True)
+    else:
+        net.conv5_3 = L.Convolution(net.relu5_2, num_output=512, pad=pad, kernel_size=kernel_size, dilation=dilation, **kwargs)
+        net.relu5_3 = L.ReLU(net.conv5_3, in_place=True)
 
     if need_fc:
         if dilated:
@@ -448,11 +457,18 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
             if dropout:
                 net.drop6 = L.Dropout(net.relu6, dropout_ratio=0.5, in_place=True)
 
-            if reduced:
-                net.fc7 = L.Convolution(net.relu6, num_output=1024, kernel_size=1, **kwargs)
+            if retrain_arm_odm:
+                if reduced:
+                    net.fc7_re = L.Convolution(net.relu6, num_output=1024, kernel_size=1, **kwargs)
+                else:
+                    net.fc7_re = L.Convolution(net.relu6, num_output=4096, kernel_size=1, **kwargs)
+                net.relu7 = L.ReLU(net.fc7_re, in_place=True)
             else:
-                net.fc7 = L.Convolution(net.relu6, num_output=4096, kernel_size=1, **kwargs)
-            net.relu7 = L.ReLU(net.fc7, in_place=True)
+                if reduced:
+                    net.fc7 = L.Convolution(net.relu6, num_output=1024, kernel_size=1, **kwargs)
+                else:
+                    net.fc7 = L.Convolution(net.relu6, num_output=4096, kernel_size=1, **kwargs)
+                net.relu7 = L.ReLU(net.fc7, in_place=True)
             if dropout:
                 net.drop7 = L.Dropout(net.relu7, dropout_ratio=0.5, in_place=True)
         else:
@@ -460,8 +476,13 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
             net.relu6 = L.ReLU(net.fc6, in_place=True)
             if dropout:
                 net.drop6 = L.Dropout(net.relu6, dropout_ratio=0.5, in_place=True)
-            net.fc7 = L.InnerProduct(net.relu6, num_output=4096)
-            net.relu7 = L.ReLU(net.fc7, in_place=True)
+            if retrain_arm_odm:
+                net.fc7_re = L.InnerProduct(net.relu6, num_output=4096)
+                net.relu7 = L.ReLU(net.fc7_re, in_place=True)
+            else:
+                net.fc7 = L.InnerProduct(net.relu6, num_output=4096)
+                net.relu7 = L.ReLU(net.fc7, in_place=True)
+
             if dropout:
                 net.drop7 = L.Dropout(net.relu7, dropout_ratio=0.5, in_place=True)
 
