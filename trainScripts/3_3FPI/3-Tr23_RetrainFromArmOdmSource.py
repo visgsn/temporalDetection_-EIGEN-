@@ -60,7 +60,7 @@ prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINI
 
 ### Extra options for training single layers harder than others
 trainHard_layers    = ["conv1_1", "conv1_2",
-                       #"conv2_1", "conv2_2",
+                       "conv2_1", "conv2_2",
                        #"conv3_1", "conv3_2", "conv3_3",
                        #"conv4_1", "conv4_2", "conv4_3",
                        #"conv5_1", "conv5_2", "conv5_3",
@@ -86,7 +86,7 @@ pretrain_model = \
 
 
 # Add extra layers on top of a "base" network (e.g. VGGNet or ResNet).
-def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations=[], lr_mult=1):
+def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations=[], lr_mult=1, retrain_arm_odm=False):
     use_relu = True
 
     # Add additional convolutional layers.
@@ -100,7 +100,10 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 1, 0, 1, lr_mult=lr_mult)
 
     from_layer = out_layer
-    out_layer = "conv6_2"
+    if retrain_arm_odm:
+        out_layer = "conv6_2_re"
+    else:
+        out_layer = "conv6_2"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 512, 3, 1, 2, lr_mult=lr_mult)
 
     arm_source_layers.reverse()
@@ -399,7 +402,7 @@ loss_param = {
 # conv5_3 ==> 32 x 32
 # fc7 ==> 16 x 16
 # conv6_2 ==> 8 x 8
-arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2']
+arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2_re']
 odm_source_layers = ['P3_re', 'P4_re', 'P5_re', 'P6_re']
 min_sizes = [32, 64, 128, 256]
 max_sizes = [[], [], [], []]
@@ -520,9 +523,10 @@ net.data, net.label = CreateAnnotatedDataLayer(train_data, batch_size=batch_size
 
 VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=useDropout,
            freeze_layers=freeze_layers, trainHard_layers=trainHard_layers, trainHard_factor=trainHard_factor,
-           retrain_arm_odm=True)
+           retrain_arm_odm=retrain_arm_odm)
 
-AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra)
+AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra,
+               retrain_arm_odm=retrain_arm_odm)
 arm_source_layers.reverse()
 normalizations.reverse()
 
@@ -578,10 +582,11 @@ net.data, net.label = CreateAnnotatedDataLayer(test_data, batch_size=test_batch_
         transform_param=test_transform_param)
 
 VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=False,
-           retrain_arm_odm=True)
+           retrain_arm_odm=retrain_arm_odm)
 
-arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2']
-AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra)
+arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2_re']
+AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra,
+               retrain_arm_odm=retrain_arm_odm)
 arm_source_layers.reverse()
 normalizations.reverse()
 

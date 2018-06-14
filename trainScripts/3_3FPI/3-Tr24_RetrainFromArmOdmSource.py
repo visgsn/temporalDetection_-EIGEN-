@@ -43,7 +43,7 @@ batch_size_WORK     = 30
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
 accum_batch_size    = 120  # Must be a multiple of batch_size
 
-job_name_template = "3_Tr22_3FpI_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
+job_name_template = "3_Tr24_3FpI_D4_{}"  # Job name for output (Brackets will be filled with resize info!)
 subsetName        = "3_train-all-T_D4"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
@@ -60,13 +60,13 @@ prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINI
 
 ### Extra options for training single layers harder than others
 trainHard_layers    = ["conv1_1", "conv1_2",
-                       #"conv2_1", "conv2_2",
+                       "conv2_1", "conv2_2",
                        #"conv3_1", "conv3_2", "conv3_3",
                        #"conv4_1", "conv4_2", "conv4_3",
                        #"conv5_1", "conv5_2", "conv5_3",
-                       "fc6", "fc7",
+                       #"fc6", "fc7",
                       ]  # Layers to train harder (in VGGNetBody)
-trainHard_factor    = 2  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
+trainHard_factor    = 5  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
 freeze_layers       = [#"conv1_1", "conv1_2",
                        #"conv2_1", "conv2_2",
                        #"conv3_1", "conv3_2", "conv3_3",
@@ -76,15 +76,17 @@ freeze_layers       = [#"conv1_1", "conv1_2",
                       ]  # Layers in VGGNetBody which will NOT be trained
 lr_mult_extra       = 1  # Learning rate factor for ExtraLayers (Transfer Connection Blocks!)
 lr_mult_refHead     = 1  # Learning rate factor for rest of net (RefineDet Head!)
+retrain_arm_odm     = True  # Set this to true if you want to retrain ARM & ODM layers from scratch (rename layers)
 # Choose best pretrained weights model
 pretrain_model = \
-    "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/train-all-T/" \
+    "refinedet_50home_320x320/KAIST_refinedet_50home_320x320_iter_40000.caffemodel"
 ########################################################################################################################
 
 
 
 # Add extra layers on top of a "base" network (e.g. VGGNet or ResNet).
-def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations=[], lr_mult=1):
+def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations=[], lr_mult=1, retrain_arm_odm=False):
     use_relu = True
 
     # Add additional convolutional layers.
@@ -98,7 +100,10 @@ def AddExtraLayers(net, use_batchnorm=True, arm_source_layers=[], normalizations
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 256, 1, 0, 1, lr_mult=lr_mult)
 
     from_layer = out_layer
-    out_layer = "conv6_2"
+    if retrain_arm_odm:
+        out_layer = "conv6_2_re"
+    else:
+        out_layer = "conv6_2"
     ConvBNLayer(net, from_layer, out_layer, use_batchnorm, use_relu, 512, 3, 1, 2, lr_mult=lr_mult)
 
     arm_source_layers.reverse()
@@ -347,7 +352,7 @@ name_size_file = "{}/{}/ImageSets/Main/test_name_size.txt".format(dataset_root, 
 # Stores LabelMapItem.
 label_map_file = "{}/code/temporalDetection_-EIGEN-/KAIST_preparation/labelmap_{}.prototxt".format(os.environ['HOME'], dataset_name)
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet. (Used if resume_training = False)
-pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
+#pretrain_model = "{}/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel".format(caffe_root)
 
 # MultiBoxLoss parameters.
 #num_classes = 21                                                                # ORIGINAL
@@ -397,7 +402,7 @@ loss_param = {
 # conv5_3 ==> 32 x 32
 # fc7 ==> 16 x 16
 # conv6_2 ==> 8 x 8
-arm_source_layers = ['conv4_3', 'conv5_3', 'fc7', 'conv6_2']
+arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2_re']
 odm_source_layers = ['P3_re', 'P4_re', 'P5_re', 'P6_re']
 min_sizes = [32, 64, 128, 256]
 max_sizes = [[], [], [], []]
@@ -517,9 +522,11 @@ net.data, net.label = CreateAnnotatedDataLayer(train_data, batch_size=batch_size
         transform_param=train_transform_param, batch_sampler=batch_sampler)
 
 VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=useDropout,
-           freeze_layers=freeze_layers, trainHard_layers=trainHard_layers, trainHard_factor=trainHard_factor)
+           freeze_layers=freeze_layers, trainHard_layers=trainHard_layers, trainHard_factor=trainHard_factor,
+           retrain_arm_odm=retrain_arm_odm)
 
-AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra)
+AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra,
+               retrain_arm_odm=retrain_arm_odm)
 arm_source_layers.reverse()
 normalizations.reverse()
 
@@ -574,10 +581,12 @@ net.data, net.label = CreateAnnotatedDataLayer(test_data, batch_size=test_batch_
         train=False, output_label=True, label_map_file=label_map_file,
         transform_param=test_transform_param)
 
-VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=False)
+VGGNetBody(net, from_layer='data', fully_conv=True, reduced=True, dilated=False, dropout=False,
+           retrain_arm_odm=retrain_arm_odm)
 
-arm_source_layers = ['conv4_3', 'conv5_3', 'fc7', 'conv6_2']
-AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra)
+arm_source_layers = ['conv4_3_re', 'conv5_3_re', 'fc7_re', 'conv6_2_re']
+AddExtraLayers(net, use_batchnorm, arm_source_layers, normalizations, lr_mult=lr_mult_extra,
+               retrain_arm_odm=retrain_arm_odm)
 arm_source_layers.reverse()
 normalizations.reverse()
 

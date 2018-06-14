@@ -328,11 +328,12 @@ def ZFNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
 
 def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
         dilated=False, nopool=False, dropout=True, freeze_layers=[], trainHard_layers=[], trainHard_factor=2,
-        dilate_pool4=False, retrain_arm_odm=False):
+        dilate_pool4=False, retrain_vgg=False, retrain_arm_odm=False):
     '''
     :param freeze_layers: These layers will not be trained further
     :param trainHard_layers: These layers will be trained with a higher learning rate than the others
     :param trainHard_factor: Learning rate factor to use for layers specified in trainHard_layers
+    :param retrain_vgg: Renames the first VGGNet layers, if set. Causing retraining from scratch
     :param retrain_arm_odm: Renames the arm source layers, if set. Causing retraining from scratch
     '''
     kwargs = {
@@ -341,9 +342,15 @@ def VGGNetBody(net, from_layer, need_fc=True, fully_conv=False, reduced=False,
             'bias_filler': dict(type='constant', value=0)}
 
     assert from_layer in net.keys()
-    net.conv1_1 = L.Convolution(net[from_layer], num_output=64, pad=1, kernel_size=3, **kwargs)
+    if retrain_vgg:
+        net.conv1_1_re = L.Convolution(net[from_layer], num_output=64, pad=1, kernel_size=3, **kwargs)
+        net.relu1_1 = L.ReLU(net.conv1_1_re, in_place=True)
+        if dropout:
+            net.drop1 = L.Dropout(net.relu1_1, dropout_ratio=0.5, in_place=True)
+    else:
+        net.conv1_1 = L.Convolution(net[from_layer], num_output=64, pad=1, kernel_size=3, **kwargs)
+        net.relu1_1 = L.ReLU(net.conv1_1, in_place=True)
 
-    net.relu1_1 = L.ReLU(net.conv1_1, in_place=True)
     net.conv1_2 = L.Convolution(net.relu1_1, num_output=64, pad=1, kernel_size=3, **kwargs)
     net.relu1_2 = L.ReLU(net.conv1_2, in_place=True)
 
