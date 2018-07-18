@@ -41,6 +41,20 @@ if __name__ == '__main__':
                        #"Tr11_HOME_i10k_Adam_512x512",
                        #"Tr12_i20k_Adam_512x512",
                        #"Tr13_NEW_i20k_lr001_bs180_512x512",
+                       #
+                       #
+                       #"2_Tr1-2_OF_D4_320x320",
+                       #"2_Tr2-2_OF_D4_320x320",
+                       #"2_Tr3_OF_D4_512x512",
+                       #"2_Tr4_OF_D4_512x512",
+                       #"2_Tr5_OF_D4_320x320",
+                       #"2_Tr6_OF_D4_320x320",
+                       #"2_Tr7_OF_D4_320x320",
+                       #"2_Tr8_OF_D4_320x320",
+                       #"2_Tr9_OF_D4_320x320",      #
+                       #"2_Tr10_OF_D4_320x320",     #
+                       #
+                       #
                        #"3_Tr1_3FpI_i60k_320x320",
                        #"3_Tr2_3FpI_D4_512x512",
                        #"3_Tr3_3FpI_D4_320x320",
@@ -48,9 +62,32 @@ if __name__ == '__main__':
                        #"3_Tr5_3FpI_D4_320x320",
                        #"3_Tr6_3FpI_D4_512x512",
                        #"3_Tr7_3FpI_D4_320x320",
-                       "3_Tr7_3FpI_D4_TEST1_320x320",
-                       "3_Tr7_3FpI_D4_TEST2_320x320",
+                       #"3_Tr7_3FpI_D4_TEST1_320x320",
+                       #"3_Tr7_3FpI_D4_TEST2_320x320",
                        #"3_Tr8_3FpI_D4_320x320",
+                       #"3_Tr9-2_3FpI_D4_320x320",
+                       #"3_Tr10-2_3FpI_D4_320x320",
+                       #"3_Tr11_3FpI_D4_320x320",
+                       "3_Tr12-2_3FpI_D4_320x320",      # MULTI_SCALE TEST!
+                       #"3_Tr13-2_3FpI_D4_320x320",
+                       "3_Tr14-1_3FpI_D4_320x320",      # MULTI_SCALE TEST!
+                       #"3_Tr15_3FpI_D4_512x512",
+                       #"3_Tr16_3FpI_D4_512x512",
+                       #"3_Tr17_3FpI_D4_320x320",
+                       #"3_Tr18_3FpI_D4_320x320",
+                       #"3_Tr19_3FpI_D4_320x320",
+                       #"3_Tr20_3FpI_D4_320x320",
+                       #"3_Tr21_3FpI_D4_320x320",
+                       #"3_Tr22_3FpI_D4_320x320",
+                       #"3_Tr23_3FpI_D4_320x320",
+                       #"3_Tr24_3FpI_D4_320x320",
+                       #"3_Tr25_3FpI_D4_320x320",
+                       #"3_Tr26_3FpI_D4_320x320",
+                       #"3_Tr27_3FpI_D4_320x320",
+                       #"3_Tr28_3FpI_D4_320x320",
+                       #"3_Tr29_3FpI_D4_320x320",
+                       #"3_Tr30_3FpI_D4_512x512",
+                       #"3_Tr31_3FpI_D4_512x512",
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
