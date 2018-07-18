@@ -26,6 +26,7 @@ if __name__ == '__main__':
     redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
     # Adapt --> "factory.py" <-- for all available subsets!
+    #--------------------SUBSET----------------------Job----------------------------------------------------------------
     subset_and_job  = [#["train-all-T",              "refinedet_50home_320x320"],
                        #["train-all-T",              "refdet_i40k_Adam_DROPOUT_512x512"],
                        #["train-all-T",              "refdet_i100k_Adam_512x512"],
@@ -43,16 +44,16 @@ if __name__ == '__main__':
                        #["train-all-T",              "Tr13_NEW_i20k_lr001_bs180_512x512"],
                        #
                        #
-                       #["2_train-all-T_D4",         "2_Tr1-2_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr1-2_OF_D4_320x320"],          # MULTI_SCALE TEST!
                        #["2_train-all-T_D4",         "2_Tr2-2_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr3_OF_D4_512x512"],
-                       #["2_train-all-T_D4",         "2_Tr4_OF_D4_512x512"],
+                       #["2_train-all-T_D4",         "2_Tr4_OF_D4_512x512"],            # MULTI_SCALE TEST!
                        #["2_train-all-T_D4",         "2_Tr5_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr6_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr7_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr8_OF_D4_320x320"],
-                       #["2_train-all-T_D4",         "2_Tr9_OF_D4_320x320"],      #
-                       #["2_train-all-T_D4",         "2_Tr10_OF_D4_320x320"],     #
+                       #["2_train-all-T_D4",         "2_Tr9_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr10_OF_D4_320x320"],
                        ["2_train-all-T_D1",         "2_Tr15-1_OF_D1_320x320"],
                        ["2_train-all-T_D7",         "2_Tr16-1_OF_D7_320x320"],
                        ["2_train-all-T_D10",        "2_Tr17-1_OF_D10_320x320"],
@@ -95,6 +96,7 @@ if __name__ == '__main__':
                        ["3_train-all-T_D7",         "3_Tr36-1_3FpI_D7_320x320"],
                        ["3_train-all-T_D10",        "3_Tr37-1_3FpI_D10_320x320"],
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
+
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
     visualizeDets   = False  # Show Detections while testing?
