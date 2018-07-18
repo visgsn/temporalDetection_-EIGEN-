@@ -25,69 +25,75 @@ if __name__ == '__main__':
     doMatlabEval    = True  # If True: Use additional MATLAB test evaluation (on "test-all")
     redoInference   = False  # If True: Re-execute inference although detecions file already exists (Time consuming)
 
-    subsetName      = "3_train-all-T_D4"  # Adapt --> "factory.py" for all available subsets!
-    job_names       = [#"refinedet_50home_320x320",
-                       #"refdet_i40k_Adam_DROPOUT_512x512",
-                       #"refdet_i100k_Adam_512x512",
-                       #"refdet_i100k_Adam_DROPOUT_512x512",
-                       #"refdet_i200k_lr001_320x320",
-                       #"refdet_i200k_lr001_512x512",
-                       #"refdet_i200k_lr001_DROPOUT_320x320",
-                       #"refdet_i200k_lr001_DROPOUT_512x512",
-                       #"refdet_i200k_lr001_DROPOUT_NEW_512x512",
-                       #"refdet_i10k_DROPOUT_test_320x320",
-                       #"refinedet_it50184_320x320",
-                       #"Tr10_i40k_Adam_DROP_lr0001STEP_512x512",
-                       #"Tr11_HOME_i10k_Adam_512x512",
-                       #"Tr12_i20k_Adam_512x512",
-                       #"Tr13_NEW_i20k_lr001_bs180_512x512",
+    # Adapt --> "factory.py" <-- for all available subsets!
+    subset_and_job  = [#["train-all-T",              "refinedet_50home_320x320"],
+                       #["train-all-T",              "refdet_i40k_Adam_DROPOUT_512x512"],
+                       #["train-all-T",              "refdet_i100k_Adam_512x512"],
+                       #["train-all-T",              "refdet_i100k_Adam_DROPOUT_512x512"],
+                       #["train-all-T",              "refdet_i200k_lr001_320x320"],
+                       #["train-all-T",              "refdet_i200k_lr001_512x512"],
+                       #["train-all-T",              "refdet_i200k_lr001_DROPOUT_320x320"],
+                       #["train-all-T",              "refdet_i200k_lr001_DROPOUT_512x512"],
+                       #["train-all-T",              "refdet_i200k_lr001_DROPOUT_NEW_512x512"],
+                       #["train-all-T",              "refdet_i10k_DROPOUT_test_320x320"],
+                       #["train-all-T",              "refinedet_it50184_320x320"],
+                       #["train-all-T",              "Tr10_i40k_Adam_DROP_lr0001STEP_512x512"],
+                       #["train-all-T",              "Tr11_HOME_i10k_Adam_512x512"],
+                       #["train-all-T",              "Tr12_i20k_Adam_512x512"],
+                       #["train-all-T",              "Tr13_NEW_i20k_lr001_bs180_512x512"],
                        #
                        #
-                       #"2_Tr1-2_OF_D4_320x320",
-                       #"2_Tr2-2_OF_D4_320x320",
-                       #"2_Tr3_OF_D4_512x512",
-                       #"2_Tr4_OF_D4_512x512",
-                       #"2_Tr5_OF_D4_320x320",
-                       #"2_Tr6_OF_D4_320x320",
-                       #"2_Tr7_OF_D4_320x320",
-                       #"2_Tr8_OF_D4_320x320",
-                       #"2_Tr9_OF_D4_320x320",      #
-                       #"2_Tr10_OF_D4_320x320",     #
+                       #["2_train-all-T_D4",         "2_Tr1-2_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr2-2_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr3_OF_D4_512x512"],
+                       #["2_train-all-T_D4",         "2_Tr4_OF_D4_512x512"],
+                       #["2_train-all-T_D4",         "2_Tr5_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr6_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr7_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr8_OF_D4_320x320"],
+                       #["2_train-all-T_D4",         "2_Tr9_OF_D4_320x320"],      #
+                       #["2_train-all-T_D4",         "2_Tr10_OF_D4_320x320"],     #
+                       ["2_train-all-T_D1",         "2_Tr15-1_OF_D1_320x320"],
+                       ["2_train-all-T_D7",         "2_Tr16-1_OF_D7_320x320"],
+                       ["2_train-all-T_D10",        "2_Tr17-1_OF_D10_320x320"],
                        #
                        #
-                       #"3_Tr1_3FpI_i60k_320x320",
-                       #"3_Tr2_3FpI_D4_512x512",
-                       #"3_Tr3_3FpI_D4_320x320",
-                       #"3_Tr4_3FpI_D4_512x512",
-                       #"3_Tr5_3FpI_D4_320x320",
-                       #"3_Tr6_3FpI_D4_512x512",
-                       #"3_Tr7_3FpI_D4_320x320",
-                       #"3_Tr7_3FpI_D4_TEST1_320x320",
-                       #"3_Tr7_3FpI_D4_TEST2_320x320",
-                       #"3_Tr8_3FpI_D4_320x320",
-                       #"3_Tr9-2_3FpI_D4_320x320",
-                       #"3_Tr10-2_3FpI_D4_320x320",
-                       #"3_Tr11_3FpI_D4_320x320",
-                       "3_Tr12-2_3FpI_D4_320x320",      # MULTI_SCALE TEST!
-                       #"3_Tr13-2_3FpI_D4_320x320",
-                       "3_Tr14-1_3FpI_D4_320x320",      # MULTI_SCALE TEST!
-                       #"3_Tr15_3FpI_D4_512x512",
-                       #"3_Tr16_3FpI_D4_512x512",
-                       #"3_Tr17_3FpI_D4_320x320",
-                       #"3_Tr18_3FpI_D4_320x320",
-                       #"3_Tr19_3FpI_D4_320x320",
-                       #"3_Tr20_3FpI_D4_320x320",
-                       #"3_Tr21_3FpI_D4_320x320",
-                       #"3_Tr22_3FpI_D4_320x320",
-                       #"3_Tr23_3FpI_D4_320x320",
-                       #"3_Tr24_3FpI_D4_320x320",
-                       #"3_Tr25_3FpI_D4_320x320",
-                       #"3_Tr26_3FpI_D4_320x320",
-                       #"3_Tr27_3FpI_D4_320x320",
-                       #"3_Tr28_3FpI_D4_320x320",
-                       #"3_Tr29_3FpI_D4_320x320",
-                       #"3_Tr30_3FpI_D4_512x512",
-                       #"3_Tr31_3FpI_D4_512x512",
+                       #["3_train-all-T_D4",         "3_Tr1_3FpI_i60k_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr2_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr3_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr4_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr5_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr6_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr7_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr7_3FpI_D4_TEST1_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr7_3FpI_D4_TEST2_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr8_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr9-2_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr10-2_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr11_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr12-2_3FpI_D4_320x320"],      # MULTI_SCALE TEST!
+                       #["3_train-all-T_D4",         "3_Tr13-2_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr14-1_3FpI_D4_320x320"],      # MULTI_SCALE TEST!
+                       #["3_train-all-T_D4",         "3_Tr15_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr16_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr17_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr18_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr19_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr20_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr21_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr22_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr23_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr24_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr25_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr26_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr27_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr28_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr29_3FpI_D4_320x320"],
+                       #["3_train-all-T_D4",         "3_Tr30_3FpI_D4_512x512"],
+                       #["3_train-all-T_D4",         "3_Tr31_3FpI_D4_512x512"],
+                       ["3_train-all-T_D1",         "3_Tr35-1_3FpI_D1_320x320"],
+                       ["3_train-all-T_D7",         "3_Tr36-1_3FpI_D7_320x320"],
+                       ["3_train-all-T_D10",        "3_Tr37-1_3FpI_D10_320x320"],
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
     single_scale    = True  # True: single scale test;  False: multi scale test
     compete_mode    = True  # Specifies evaluation to use UUID (salt) and delete VOC dets afterwards, if False.
@@ -113,7 +119,7 @@ if __name__ == '__main__':
         experimentName = "{}_{}".format(experimentName, expNamePostfix)  # Add Postfix, if set
 
 
-    for job_name in job_names:
+    for subsetName, job_name in subset_and_job:
         train_test_outPath = '{}/models/VGGNet/KAIST/{}/{}/'.format(path_prefix, subsetName, job_name)
         test_set = 'kaist_{}_test'.format(subsetName) # Available: 'kaist_Train-all-T_test' or ... (See --> factory.py for all)
 
