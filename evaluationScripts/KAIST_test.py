@@ -54,9 +54,13 @@ if __name__ == '__main__':
                        #["2_train-all-T_D4",         "2_Tr8_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr9_OF_D4_320x320"],
                        #["2_train-all-T_D4",         "2_Tr10_OF_D4_320x320"],
-                       ["2_train-all-T_D1",         "2_Tr15-1_OF_D1_320x320"],
-                       ["2_train-all-T_D7",         "2_Tr16-1_OF_D7_320x320"],
-                       ["2_train-all-T_D10",        "2_Tr17-1_OF_D10_320x320"],
+                       #["2_train-all-T_D1",         "2_Tr15-1_OF_D1_320x320"],
+                       ["2_train-all-T_D1",         "2_Tr15-2_OF_D1_320x320"],     #
+                       #["2_train-all-T_D7",         "2_Tr16-1_OF_D7_320x320"],
+                       ["2_train-all-T_D7",         "2_Tr16-2_OF_D7_320x320"],     #
+                       #["2_train-all-T_D10",        "2_Tr17-1_OF_D10_320x320"],
+                       ["2_train-all-T_D10",        "2_Tr17-2_OF_D10_320x320"],    #
+                       ["2_train-all-T_D4",         "2_Tr18-2_OF_D4_320x320"],     #
                        #
                        #
                        #["3_train-all-T_D4",         "3_Tr1_3FpI_i60k_320x320"],
@@ -92,9 +96,12 @@ if __name__ == '__main__':
                        #["3_train-all-T_D4",         "3_Tr29_3FpI_D4_320x320"],
                        #["3_train-all-T_D4",         "3_Tr30_3FpI_D4_512x512"],
                        #["3_train-all-T_D4",         "3_Tr31_3FpI_D4_512x512"],
-                       ["3_train-all-T_D1",         "3_Tr35-1_3FpI_D1_320x320"],
-                       ["3_train-all-T_D7",         "3_Tr36-1_3FpI_D7_320x320"],
-                       ["3_train-all-T_D10",        "3_Tr37-1_3FpI_D10_320x320"],
+                       #["3_train-all-T_D1",         "3_Tr35-1_3FpI_D1_320x320"],
+                       ["3_train-all-T_D1",         "3_Tr35-2_3FpI_D1_320x320"],    #
+                       #["3_train-all-T_D7",         "3_Tr36-1_3FpI_D7_320x320"],
+                       ["3_train-all-T_D7",         "3_Tr36-2_3FpI_D7_320x320"],    #
+                       #["3_train-all-T_D10",        "3_Tr37-1_3FpI_D10_320x320"],
+                       ["3_train-all-T_D10",        "3_Tr37-2_3FpI_D10_320x320"],   #
                        ]  # DEFAULT: ["refinedet_vgg16_320x320"]
 
     single_scale    = True  # True: single scale test;  False: multi scale test

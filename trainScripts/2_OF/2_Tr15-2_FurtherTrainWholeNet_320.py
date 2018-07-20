@@ -27,13 +27,15 @@ atWORK  = True
 # Set true if you want to start training right after generating all files. (DEFAULT: True)
 run_soon = True
 # Set if you want to load from most recently saved snapshot. False: load from pretrain_model (DEFAULT: True)
-resume_training = True
+resume_training = False
 # If true, Remove old model files (old snapshot files). (DEFAULT: False)
 remove_old_models = False
 
-max_iter_train  = 1700  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
-snapshot_train  = 50  # Number of iterations to take a snapshot
+max_iter_train  = 300  # Maximum number of solver iterations (#Epochs = #AllTrainImages / batch_size)
+snapshot_train  = 15  # Number of iterations to take a snapshot
 base_lr_train   = 0.001  # Learning rate to start with (ORIGINAL: 0.0005)
+stepvalues      = [50000]  # Iteration values for changing learning rate
+gamma           = 0.1  # Reduce learning rate by this factor when a certain stepvalue is reached
 useDropout      = False  # If true: Use dropout for training
 useResize512    = False  # False: 320x320   True: 512x512
 
@@ -41,10 +43,10 @@ useResize512    = False  # False: 320x320   True: 512x512
 batch_size_HOME     = 8
 batch_size_WORK     = 30
 # Virtual batch size for solver (One iteration = accum_batch_size processed images! --> NO need to adapt max_iter_train)
-accum_batch_size    = 120  # Must be a multiple of batch_size
+accum_batch_size    = 180  # Must be a multiple of batch_size
 
-job_name_template = "3_Tr37-1_3FpI_D10_{}"  # Job name for output (Brackets will be filled with resize info!)
-subsetName        = "3_train-all-T_D10"  # Subset name to train on (existing)
+job_name_template = "2_Tr15-2_OF_D1_{}"  # Job name for output (Brackets will be filled with resize info!)
+subsetName        = "2_train-all-T_D1"  # Subset name to train on (existing)
 dataset_name      = "KAIST"  # Define Dataset name to train on
 
 caffe_root      = "{}/code/caffe/RefineDet".format(os.environ['HOME'])  # The directory which contains the caffe code.
@@ -57,18 +59,20 @@ dataset_root_WORK = "/net4/merkur/storage/deeplearning/users/gueste/data/{}".for
 prefix_saveSnapJob_HOME = "{}/train_test_data".format(os.environ['HOME'])
 prefix_saveSnapJob_WORK = "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test"
 
-
-### Extra options for training single layers harder than others
-trainHard_layers    = ["conv1_1", "conv1_2",
+### Extra options for using pretrained model from 3_Tr7-1_TrainHeadHard...
+trainHard_layers    = []  # Layers to train harder (in VGGNetBody)
+trainHard_factor    = 0  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
+freeze_layers       = ["conv1_1", "conv1_2",
                        "conv2_1", "conv2_2",
-                      ]  # Layers to train harder (in VGGNetBody)
-trainHard_factor    = 5  # Factor for learning rate (original learning rate gets multiplied with this in VGGNetBody)
-freeze_layers       = []  # Layers in VGGNetBody which will NOT be trained
-lr_mult             = 0  # Learning rate factor for rest of net (eccept VGGNetBody!)
+                       "conv3_1", "conv3_2", "conv3_3",
+                       "conv4_1", "conv4_2", "conv4_3",
+                       "conv5_1", "conv5_2", "conv5_3",
+                      ]  # Layers in VGGNetBody which will NOT be trained
+lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
 # Choose best pretrained weights model
 pretrain_model = \
-    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/train-all-T/" \
-    "refinedet_50home_320x320/KAIST_refinedet_50home_320x320_iter_40000.caffemodel"
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/" \
+    "2_train-all-T_D1/2_Tr15-1_OF_D1_320x320/KAIST_2_Tr15-1_OF_D1_320x320_iter_1150.caffemodel"
 ########################################################################################################################
 
 
@@ -445,8 +449,8 @@ solver_param = {
     'base_lr': base_lr_train,
     'weight_decay': 0.0005,
     'lr_policy': "multistep",
-    'stepvalue': [50000],
-    'gamma': 0.1,
+    'stepvalue': stepvalues,
+    'gamma': gamma,
     'momentum': 0.9,
     'iter_size': iter_size,
     #'max_iter': 120000,                        # ORIGINAL

@@ -69,8 +69,8 @@ freeze_layers       = ["conv1_1", "conv1_2",
 lr_mult             = 1  # Learning rate factor for rest of net (eccept VGGNetBody!)
 # Choose best pretrained weights model
 pretrain_model = \
-    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/3_train-all-T_D1/" \                  # NOCH ANPASSEN!!!
-    "3_Tr9-2_3FpI_D4_320x320/3_Tr9-1 (Vortraining)/..."
+    "/net4/merkur/storage/deeplearning/users/gueste/TRAINING_test/models/VGGNet/KAIST/" \
+    "3_train-all-T_D1/3_Tr35-1_3FpI_D1_320x320/KAIST_3_Tr35-1_3FpI_D1_320x320_iter_600.caffemodel"
 ########################################################################################################################
 
 
