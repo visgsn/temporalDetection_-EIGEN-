@@ -7,13 +7,13 @@
 %% Set up necessary path variables
 %##########################################################################
 % Change "atWORK" to switch between HOME and WORK directories (False: HOME - True: WORK)
-atWork = true;
+atWork = false;
 
-iterToTest     = '210';  % Specify which solver iteration Nr. to test
+iterToTest     = '3000';  % Specify which solver iteration Nr. to test
 thrShow        = 45;  % Set confidence threshold for showing detections
 
-subsetName     = '2_train-all-T_D7'; % '3_train-all-T_D4'; % 'train-all-T'
-job_name       = '2_Tr16-2_OF_D7_320x320';  % DEFAULT: 'refinedet_vgg16_320x320'
+subsetName     = 'train-all-T'; % '3_train-all-T_D4'; % 'train-all-T'
+job_name       = 'Tr13_NEW_i20k_lr001_bs180_512x512';  % DEFAULT: 'refinedet_vgg16_320x320'
 experimentName = 'singleScale';  % Name of evalOutput subfolder (experiment name)
 
 % Path prefix for output directory
@@ -65,4 +65,4 @@ addpath( genpath( piotrToolboxPath ) );
 
 
 %% Call function to show results
-evalKAIST(inOutDir, dataDir, bbsNmFile, 1, 'thrShow',thrShow)
+evalKAIST(inOutDir, dataDir, bbsNmFile, 0, 'thrShow',thrShow)
